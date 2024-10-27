@@ -3,33 +3,22 @@
 
 <head>
   <title>Detail - UTS Ebis</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="author" content="">
-  <meta name="keywords" content="">
-  <meta name="description" content="">
-</head>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-
-<link rel="stylesheet" type="text/css" href="css/vendor.css">
-<link rel="stylesheet" type="text/css" href="style.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
-  rel="stylesheet">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="css/vendor.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chilanka&family=Montserrat:wght@300;400;500&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
-
   <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
     <defs>
       <symbol xmlns="http://www.w3.org/2000/svg" id="link" viewBox="0 0 24 24">
@@ -341,22 +330,22 @@
 
     </div>
   </header>
-
-  <section id="clothing" class="my-5 overflow-hidden">
+  
+  <section id="product-section" class="my-5 overflow-hidden"> 
     <div class="container">
       <div class="row">
-        <div class="col-12 d-flex"> <!-- Using Bootstrap's grid system -->
+        <div class="col-12 d-flex">
           <!-- Left Container: Product Image -->
-          <div class="product-image pe-3"> <!-- Using pe-3 for padding-end -->
+          <div class="product-image pe-3">
             <a href="">
               <img src="images/item1.jpg" class="img-fluid rounded-4" alt="Grey hoodie">
             </a>
           </div>
-  
+
           <!-- Right Container: Product Description -->
-          <div class="product-details flex-grow-1"> <!-- Flex-grow to take remaining space -->
+          <div class="product-details flex-grow-1">
             <h3 class="product-title pt-4 m-0">Grey hoodie</h3>
-            
+
             <div class="card-text my-3">
               <span class="rating secondary-font">
                 <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
@@ -368,78 +357,29 @@
               </span>
               <h3 class="secondary-font text-primary mt-2">$18.00</h3>
             </div>
-  
+
+            <!-- Quantity Control -->
+            <div class="d-flex align-items-center mt-3">
+              <button @click="decreaseQuantity" class="btn btn-outline-secondary">-</button>
+              <span class="mx-4">{{ quantity }}</span>
+              <button @click="increaseQuantity" class="btn btn-outline-secondary">+</button>
+            </div>
+
             <div class="d-flex flex-wrap mt-3">
               <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
                 <h5 class="text-uppercase m-0">Add to Cart</h5>
               </a>
-              <a href="#" class="btn-wishlist px-4 pt-3">
-                <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
-              </a>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
-    <div class="container mt-3" style="background-color: rgb(251, 249, 241);">
-      <p>detail produk<br>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-      </p>
-    </div>
-  </section>
-    
-  <section id="service">
-    <div class="container py-5 my-5">
-      <div class="row g-md-5 pt-4">
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:shopping-cart"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">Free Delivery</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:user-check"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">100% secure payment</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:tag"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">Daily Offer</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 my-3">
-          <div class="card">
-            <div>
-              <iconify-icon class="service-icon text-primary" icon="la:award"></iconify-icon>
-            </div>
-            <h3 class="card-title py-2 m-0">Quality guarantee</h3>
-            <div class="card-text">
-              <p class="blog-paragraph fs-6">Lorem ipsum dolor sit amet, consectetur adipi elit.</p>
-            </div>
-          </div>
-        </div>
 
-      </div>
+    <div class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);">
+      <p><b>Detail Produk:</b><br>Lorem Ipsum is simply dummy text of the printing and typesetting industry...</p>
     </div>
   </section>
-  
+
   <section id="insta" class="my-5">
     <div class="row g-0 py-5">
       <div class="col instagram-item  text-center position-relative">
@@ -610,6 +550,28 @@
     </div>
   </div>
 
+  <!-- Vue.js Instance -->
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          quantity: 1, // Initial quantity
+        };
+      },
+      methods: {
+        increaseQuantity() {
+          this.quantity++;
+        },
+        decreaseQuantity() {
+          if (this.quantity > 1) {
+            this.quantity--;
+          }
+        }
+      }
+    }).mount('#product-section'); // Mount to the section with the id 'product-section'
+  </script>
 
   <script src="js/jquery-1.11.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
