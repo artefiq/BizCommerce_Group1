@@ -12,6 +12,42 @@ class User(BaseDB):
     username = Column(String, unique = True, index = True)
     hashed_password = Column(String)
 
+# punya uts ebis
+class Produk(BaseDB):
+    __tablename__ = "produk"
+    id = Column(Integer, primary_key=True)
+    kategori = Column(Integer, ForeignKey('kategori.id'), nullable=False)
+    nama = Column(String, unique=True, index=True)
+    deskripsi = Column(String, nullable=False)
+    stok = Column(Integer, nullable=False)
+    harga = Column(Integer, nullable=False)
+
+class Keranjang(BaseDB):
+    __tablename__ = "keranjang"
+    id = Column(Integer, primary_key=True)
+    user = Column(Integer, ForeignKey('users.id'), nullable=False)
+    produk = Column(Integer, ForeignKey('produk.id'), nullable=False)
+    qty = Column(Integer, nullable=False)
+
+class Review(BaseDB):
+    __tablename__ = "review"
+    id = Column(Integer, primary_key=True)
+    pesanan = Column(Integer, ForeignKey('pesanan.id'), nullable=False)
+    produk = Column(Integer, ForeignKey('produk.id'), nullable=False)
+    rating = Column(Integer, nullable=False)
+    review = Column(String, nullable=False)
+
+class Pesanan(BaseDB):
+    __tablename__ = "pesanan"
+    id = Column(Integer, primary_key=True)
+    user = Column(Integer, ForeignKey('users.id'), nullable=False)
+    Produk = 
+    metode bayar
+    tanggal
+    status pesanan
+
+########################################################################################################
+
 class Profile(BaseDB):
     __tablename__ = "profile"
     id = Column(Integer, primary_key=True)

@@ -28,8 +28,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile
 
 
-app = FastAPI(title="Web service Medimate",
-    description="Web service tubes kelompok 1 2024",
+app = FastAPI(title="Web service uts e business",
+    description="Web service uts kelompok 1 2024",
     version="0.0.1",)
 
 app.add_middleware(
