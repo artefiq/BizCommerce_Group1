@@ -65,6 +65,5 @@ class Metode(BaseDB):
 
 ########################################################################################################
 
-
 # doctor = relationship('Doctor')
 # facility = relationship('HealthFacility')

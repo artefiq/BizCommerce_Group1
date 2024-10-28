@@ -22,54 +22,120 @@ class Token(BaseModel):
     token_type: str
 
 ###############################
-# profile
-
-class ProfileBase(BaseModel):
-    nama: str
-    tanggalLahir: date
-    jenisKelamin: str
-    alamat: str
-    email: str
-    noTelepon: str
-    userPhoto: Optional[str] = None
-    userId: int
-    isMainProfile: int
-
-class ProfileCreate(ProfileBase):
+# produk
+class ProdukBase(BaseModel):
+    pass
+    
+class ProdukCreate(ProdukBase):
     pass
 
-class ProfileUpdate(ProfileBase):
+class ProdukUpdate(ProdukBase):
     pass
 
-class Profile(ProfileBase):
+class ProdukDelete(ProdukBase):
+    pass
+
+class Produk(ProdukBase):
     id: int
 
     class Config:
         from_attributes = True
 
-    @field_validator("tanggalLahir")
-    def parse_tanggal_lahir(cls, value):
-        if isinstance(value, str):
-            return date.fromisoformat(value)
-        return value
+###############################
+# keranjang
+class keranjangBase(BaseModel):
+    pass
 
-    @property
-    def formatted_tanggal_lahir(self):
-        return self.tanggalLahir.strftime("%d %m %Y")
+class keranjangCreate(keranjangBase):
+    pass
+
+class keranjangUpdate(keranjangBase):
+    pass
+
+class keranjangDelete(keranjangBase):
+    pass
+
+class keranjang(keranjangBase):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 ###############################
-# profileRelation
-
-class ProfileRelationBase(BaseModel):
-    relation: str
-
-class ProfileRelationCreate(ProfileRelationBase):
+# review
+class reviewBase(BaseModel):
     pass
 
-class ProfileRelationUpdate(ProfileRelationBase):
+class reviewCreate(reviewBase):
     pass
 
-class ProfileRelation(ProfileRelationBase):
+class reviewUpdate(reviewBase):
+    pass
+
+class reviewDelete(reviewBase):
+    pass
+
+class review(reviewBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+###############################
+# pesanan
+class pesananBase(BaseModel):
+    pass
+
+class pesananCreate(pesananBase):
+    pass
+
+class pesananUpdate(pesananBase):
+    pass
+
+class pesananDelete(pesananBase):
+    pass
+
+class pesanan(pesananBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+###############################
+# kategori
+class kategoriBase(BaseModel):
+    pass
+
+class kategoriCreate(kategoriBase):
+    pass
+
+class kategoriUpdate(kategoriBase):
+    pass
+
+class kategoriDelete(kategoriBase):
+    pass
+
+class kategori(kategoriBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+###############################
+# metode
+class metodeBase(BaseModel):
+    pass
+
+class metodeCreate(metodeBase):
+    pass
+
+class metodeUpdate(metodeBase):
+    pass
+
+class metodeDelete(metodeBase):
+    pass
+
+class metode(metodeBase):
     id: int
 
     class Config:
