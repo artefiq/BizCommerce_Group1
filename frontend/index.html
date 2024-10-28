@@ -99,49 +99,71 @@
     <div class="preloader">
     </div>
   </div>
+  
+  <!-- Modal -->
+<!-- Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cartModalLabel">Your Cart</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="order-md-last">
+          <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-primary">Your cart</span>
+            <span class="badge bg-primary rounded-circle pt-2">3</span>
+          </h4>
+          <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+              <div class="me-2">
+                <h6 class="my-0">Grey Hoodie</h6>
+                <small class="text-body-secondary">Brief description</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary btn-sm me-2" onclick="decreaseQuantity('qty1')">-</button>
+                <input type="text" id="qty1" class="form-control" value="1" min="1" style="width: 50px; text-align: center;" readonly>
+                <button class="btn btn-outline-secondary btn-sm ms-2" onclick="increaseQuantity('qty1')">+</button>
+                <span class="text-body-secondary ms-3">$12</span>
+              </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+              <div class="me-2">
+                <h6 class="my-0">Dog Food</h6>
+                <small class="text-body-secondary">Brief description</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary btn-sm me-2" onclick="decreaseQuantity('qty2')">-</button>
+                <input type="text" id="qty2" class="form-control" value="1" min="1" style="width: 50px; text-align: center;" readonly>
+                <button class="btn btn-outline-secondary btn-sm ms-2" onclick="increaseQuantity('qty2')">+</button>
+                <span class="text-body-secondary ms-3">$8</span>
+              </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between lh-sm">
+              <div class="me-2">
+                <h6 class="my-0">Soft Toy</h6>
+                <small class="text-body-secondary">Brief description</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <button class="btn btn-outline-secondary btn-sm me-2" onclick="decreaseQuantity('qty3')">-</button>
+                <input type="text" id="qty3" class="form-control" value="1" min="1" style="width: 50px; text-align: center;" readonly>
+                <button class="btn btn-outline-secondary btn-sm ms-2" onclick="increaseQuantity('qty3')">+</button>
+                <span class="text-body-secondary ms-3">$5</span>
+              </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+              <span class="fw-bold">Total (USD)</span>
+              <strong>$20</strong>
+            </li>
+          </ul>
 
-  <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasCart" aria-labelledby="My Cart">
-    <div class="offcanvas-header justify-content-center">
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body">
-      <div class="order-md-last">
-        <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span class="text-primary">Your cart</span>
-          <span class="badge bg-primary rounded-circle pt-2">3</span>
-        </h4>
-        <ul class="list-group mb-3">
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Grey Hoodie</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$12</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Dog Food</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$8</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between lh-sm">
-            <div>
-              <h6 class="my-0">Soft Toy</h6>
-              <small class="text-body-secondary">Brief description</small>
-            </div>
-            <span class="text-body-secondary">$5</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between">
-            <span class="fw-bold">Total (USD)</span>
-            <strong>$20</strong>
-          </li>
-        </ul>
-
-        <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+          <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
   <div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasSearch"
     aria-labelledby="Search">
@@ -319,8 +341,7 @@
                 </li>
 
                 <li class="">
-                  <a href="index.html" class="mx-3" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCart"
-                    aria-controls="offcanvasCart">
+                  <a href="#" class="mx-3" data-bs-toggle="modal" data-bs-target="#cartModal">
                     <iconify-icon icon="mdi:cart" class="fs-4 position-relative"></iconify-icon>
                     <span class="position-absolute translate-middle badge rounded-circle bg-primary pt-2">
                       03
@@ -1690,8 +1711,9 @@
         </div>
         <div class="col-md-6 text-md-end">
           <p class="secondary-font">Free HTML Template by <a href="https://templatesjungle.com/" target="_blank"
-              class="text-decoration-underline fw-bold text-black-50"> TemplatesJungle</a> Distributed by <a href="https://themewagon.com/" target="_blank"
-              class="text-decoration-underline fw-bold text-black-50"> ThemeWagon</a></p>
+              class="text-decoration-underline fw-bold text-black-50"> TemplatesJungle</a> Distributed by <a
+              href="https://themewagon.com/" target="_blank" class="text-decoration-underline fw-bold text-black-50">
+              ThemeWagon</a></p>
         </div>
       </div>
     </div>

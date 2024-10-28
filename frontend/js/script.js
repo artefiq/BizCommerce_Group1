@@ -184,3 +184,47 @@
   }); // End of a document
 
 })(jQuery);
+
+// Quantity controls for cart items
+function increaseQuantity(id) {
+  const input = document.getElementById(id);
+  input.value = parseInt(input.value) + 1;
+  updateCartTotal(); // Add this if you want to automatically update the total
+}
+
+function decreaseQuantity(id) {
+  const input = document.getElementById(id);
+  if (input.value > 1) {
+      input.value = parseInt(input.value) - 1;
+      updateCartTotal(); // Add this if you want to automatically update the total
+  }
+}
+
+// Optional: Function to update the cart total
+function updateCartTotal() {
+  const quantities = [
+      { id: 'qty1', price: 12 },
+      { id: 'qty2', price: 8 },
+      { id: 'qty3', price: 5 }
+  ];
+
+  let total = 0;
+  quantities.forEach(item => {
+      const quantity = parseInt(document.getElementById(item.id).value);
+      total += quantity * item.price;
+  });
+
+  // Update the total display
+  document.querySelector('.list-group-item strong').textContent = `$${total}`;
+}
+
+// Optional: Add input event listeners to handle manual quantity changes
+document.addEventListener('DOMContentLoaded', function() {
+  const quantityInputs = document.querySelectorAll('input[type="number"]');
+  quantityInputs.forEach(input => {
+      input.addEventListener('change', function() {
+          if (this.value < 1) this.value = 1;
+          updateCartTotal();
+      });
+  });
+});
