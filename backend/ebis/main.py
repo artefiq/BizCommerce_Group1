@@ -151,592 +151,139 @@ async def token(req: Request, form_data: OAuth2PasswordRequestForm = Depends(),d
     return {"access_token": access_token, "token_type": "bearer"}
 
 ####################################################################################################
-# punya medimate
-
-###################  profile
+# punya e bis
 
 UPLOAD_DIRECTORY = "./../img"
 
-# create profile
-@app.post("/create_profile/{user_id}")
-def create_profile(user_id: int, profile: schemas.ProfileCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+# -------------------- PRODUK CRUD Endpoints --------------------
+
+@app.post("/produk/", response_model=schemas.Produk)
+def create_produk(produk: schemas.ProdukCreate, db: Session = Depends(get_db)):
+    return crud.create_produk(db=db, produk=produk)
+
+@app.get("/produk/{produk_id}", response_model=schemas.Produk)
+def read_produk(produk_id: int, db: Session = Depends(get_db)):
+    db_produk = crud.get_produk(db, produk_id=produk_id)
+    if db_produk is None:
+        raise HTTPException(status_code=404, detail="Produk not found")
+    return db_produk
+
+@app.put("/produk/{produk_id}", response_model=schemas.Produk)
+def update_produk(produk_id: int, produk: schemas.ProdukUpdate, db: Session = Depends(get_db)):
+    return crud.update_produk(db=db, produk_id=produk_id, produk=produk)
+
+@app.delete("/produk/{produk_id}")
+def delete_produk(produk_id: int, db: Session = Depends(get_db)):
+    crud.delete_produk(db, produk_id=produk_id)
+    return {"message": "Produk deleted"}
+
+# -------------------- KERANJANG CRUD Endpoints --------------------
+
+@app.post("/keranjang/", response_model=schemas.Keranjang)
+def create_keranjang(keranjang: schemas.KeranjangCreate, db: Session = Depends(get_db)):
+    return crud.create_keranjang(db=db, keranjang=keranjang)
+
+@app.get("/keranjang/{keranjang_id}", response_model=schemas.Keranjang)
+def read_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
+    db_keranjang = crud.get_keranjang(db, keranjang_id=keranjang_id)
+    if db_keranjang is None:
+        raise HTTPException(status_code=404, detail="Keranjang not found")
+    return db_keranjang
+
+@app.put("/keranjang/{keranjang_id}", response_model=schemas.Keranjang)
+def update_keranjang(keranjang_id: int, keranjang: schemas.KeranjangUpdate, db: Session = Depends(get_db)):
+    return crud.update_keranjang(db=db, keranjang_id=keranjang_id, keranjang=keranjang)
+
+@app.delete("/keranjang/{keranjang_id}")
+def delete_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
+    crud.delete_keranjang(db, keranjang_id=keranjang_id)
+    return {"message": "Keranjang deleted"}
+
+# -------------------- REVIEW CRUD Endpoints --------------------
 
-    if user_id != profile.userId:
-        raise HTTPException(status_code=401, detail="Unauthorized access to create profile")
-
-    return crud.create_profile(db=db, profile=profile)
-
-# update profile
-@app.put("/update_profile/{profile_id}", response_model=schemas.Profile)
-def update_profile(profile_id: int, profile_update: schemas.ProfileUpdate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    updated_profile = crud.update_profile(db, profile_id, profile_update)
-    if updated_profile is None:
-        raise HTTPException(status_code=404, detail="Profile not found")
-    return updated_profile
-
-# upload image
-@app.post("/upload_profile_image")
-async def upload_image(file: UploadFile = File(...)):
-    file_location = f"{UPLOAD_DIRECTORY}/profile_picture/{file.filename}"
-    with open(file_location, "wb+") as file_object:
-        file_object.write(file.file.read())
-    return JSONResponse(content={"image_name": file.filename})
-
-# profile by user id
-@app.get("/profile_user_id/{user_id}", response_model=list[schemas.Profile])
-def read_profile_user_id(user_id : int, db: Session = Depends(get_db), token : str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    return crud.get_profile_by_user_id(db, user_id)
-
-# profile by profile id
-@app.get("/profile/{profile_id}", response_model=schemas.Profile)
-def read_profile(profile_id : int, db: Session = Depends(get_db), token : str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    return crud.get_profile(db, profile_id)
-
-# profile picture
-@app.get("/profile_picture/{profile_id}")
-def read_profile_picture(profile_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    profile = crud.get_profile(db,profile_id)
-    if not(profile):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = '../img/profile_picture/'
-    nama_image = profile.userPhoto
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    return FileResponse(path_img+nama_image)
-
-@app.post("/upload_profile_picture/")
-async def upload_profile_picture(profile_id: int, file: UploadFile = File(...), db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    profile = crud.get_profile(db, profile_id)
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    path_img = '../img/profile_picture/'
-    Path(path_img).mkdir(parents=True, exist_ok=True)
-    file_path = Path(path_img) / file.filename
-
-    with file_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    profile.userPhoto = file.filename
-    db.commit()
-
-    return {"filename": file.filename}
-
-# delete profile by profile id
-@app.delete("/delete_profile/{profile_id}")
-def delete_profile(profile_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    # Panggil fungsi untuk menghapus profil berdasarkan profile_id
-    deleted_profile = crud.delete_profile(db, profile_id)
-    if not deleted_profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-
-    return {"message": "Profile deleted successfully"}
-
-###################  profile relation
-
-# Get all Profile Relations
-@app.get("/profile_relation/", response_model=list[schemas.ProfileRelation])
-def read_all_profile_relations(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    profile_relations = crud.get_all_profile_relations(db)
-    return profile_relations
-
-# Get Profile Relation by ID
-@app.get("/profile_relation/{relation_id}", response_model=schemas.ProfileRelation)
-def read_profile_relation(relation_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    profile_relation = crud.get_relation_id(db, relation_id)
-    if profile_relation is None:
-        raise HTTPException(status_code=404, detail="ProfileRelation not found")
-    return profile_relation
-
-###################  doctor
-
-# Get all doctor
-@app.get("/doctor/", response_model=list[schemas.Doctor])
-def read_all_doctor(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    doctor = crud.get_all_doctors(db)
-    return doctor
-
-# Get Doctor by ID
-@app.get("/doctor_id/{doctor_id}", response_model = schemas.Doctor)
-def read_doctor(doctor_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    doctor = crud.get_doctor_id(db, doctor_id)
-    return doctor
-
-# Get all doctor by poly id
-@app.get("/doctor_poly_id/{poly_id}", response_model=list[schemas.Doctor])
-def read_all_doctor__poly_id(poly_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    doctor = crud.get_doctor_poly_id(db, poly_id)
-    if not doctor:
-        raise HTTPException(status_code=404, detail=f"Doctor not found for poly_id = {poly_id}")
-    return doctor
-
-# doctor picture
-@app.get("/doctor_picture/{doctor_id}")
-def read_doctor_image(doctor_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    doctor = crud.get_doctor_id(db,doctor_id)
-    if not(doctor):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = '../img/doctor_picture/'
-    nama_image = doctor.foto
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    return FileResponse(path_img+nama_image)
-
-
-###################  doctor schedule
-
-# Create Doctor Schedule
-@app.post("/doctor_schedule/", response_model=schemas.DoctorSchedule)
-def create_doctor_schedule(doctor_schedule: schemas.DoctorScheduleCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    return crud.create_doctor_schedule(db=db, doctorSchedule=doctor_schedule)
-
-# Update Doctor Schedule
-@app.put("/doctor_schedule/{doctor_schedule_id}", response_model=schemas.DoctorSchedule)
-def update_doctor_schedule(doctor_schedule_id: int, doctor_schedule: schemas.DoctorScheduleUpdate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    db_doctor_schedule = crud.get_doctor_schedule_id(db, doctor_schedule_id)
-    if db_doctor_schedule is None:
-        raise HTTPException(status_code=404, detail=f"Doctor schedule not found for id = {doctor_schedule_id}")
-    return crud.update_doctor_schedule(db=db, doctor_schedule_id=doctor_schedule_id, doctorSchedule=doctor_schedule)
-
-# Get all Doctor Schedules
-@app.get("/doctor_schedule/", response_model=list[schemas.DoctorSchedule])
-def read_all_doctor_schedules(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    doctor_schedules = crud.get_all_doctor_schedules(db)
-    return doctor_schedules
-
-# Get Doctor Schedule by ID
-@app.get("/doctor_schedule_id/{doctor_schedule_id}", response_model=schemas.DoctorSchedule)
-def read_doctor_schedule(doctor_schedule_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    doctor_schedule = crud.get_doctor_schedule_id(db, doctor_schedule_id)
-    if doctor_schedule is None:
-        raise HTTPException(status_code=404, detail=f"Doctor schedule not found for id = {doctor_schedule_id}")
-    return doctor_schedule
-
-# Get Doctor Schedule by ID
-@app.get("/doctor_schedule_doctor_id/{doctor_id}", response_model=list[schemas.DoctorSchedule])
-def read_doctor_schedule_doctor_id(doctor_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    doctor_schedule_doctor_id = crud.get_doctor_schedule_doctor_id(db, doctor_id)
-    if not doctor_schedule_doctor_id:
-        raise HTTPException(status_code=404, detail=f"Doctor schedule not found for doctor id = {doctor_id}")
-    return doctor_schedule_doctor_id
-
-###################  appointments
-
-# create appointment
-    # belum pake profile id buat validasi, bisa diinject profile lain
-@app.post("/create_appointment/")
-def create_appointment(appointment: schemas.AppointmentCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)): # profile_id : int
-    
-    ## pake ini buat verify session nya
-    # usr = verify_token(token)
-
-    # if usr["profile_id"] != profile_id:
-    #     raise HTTPException(status_code=401, detail="Unauthorized access to create profile")
-
-    return crud.create_appointment(db, appointment)
-
-# read appointment by appointment id
-@app.get("/appointment/{appointment_id}", response_model=schemas.Appointment)
-def read_appointment(appointment_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    appointment = crud.get_appointment(db, appointment_id)
-    if appointment is None:
-        raise HTTPException(status_code=404, detail="Appointment not found")
-    db.refresh(appointment)  # Ensure relationships are loaded
-    return appointment
-
-# read appointment by profile id
-@app.get("/appointment_profile/{profile_id}", response_model=list[schemas.Appointment])
-def read_appointment_profile_id(profile_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    appointments_profile = crud.get_appointments_by_profile_id(db, profile_id)
-    if not appointments_profile:
-        raise HTTPException(status_code=404, detail="Appointment not found")
-    for appointment in appointments_profile:
-        db.refresh(appointment)  # Ensure relationships are loaded for each appointment
-    return appointments_profile
-
-# update appointment
-@app.put("/appointment_update/{appointment_id}", response_model=schemas.Appointment)
-def update_appointment(appointment_id: int, appointment_update: schemas.AppointmentUpdate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    updated_appointment = crud.update_appointment(db, appointment_id, appointment_update)
-    if updated_appointment is None:
-        raise HTTPException(status_code=404, detail="Appointment not found")
-    return updated_appointment
-
-# delete appointment by id
-@app.delete("/delete_appointment/{appointment_id}")
-def delete_appointment(appointment_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    # Panggil fungsi untuk menghapus profil berdasarkan appointment_id
-    deleted_appointment = crud.delete_appointment(db, appointment_id)
-    if not deleted_appointment:
-        raise HTTPException(status_code=404, detail="Appointment not found")
-
-    return {"message": "Appointment deleted successfully"}
-
-###################  articles
-
-# get all health articles
-@app.get("/health_article/", response_model=list[schemas.HealthArticle])
-def read_all_health_article(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    article = crud.get_all_health_articles(db)
-    return article
-
-# Get Health Article by ID
-@app.get("/health_article_id/{article_id}", response_model=schemas.HealthArticle)
-def read_health_article(article_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    article = crud.get_health_article(db, article_id)
-    return article
-
-# article picture
-@app.get("/article_picture/{article_id}")
-def read_article_image(article_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    article = crud.get_health_article(db,article_id)
-    if not(article):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = '../img/article_picture/'
-    nama_image = article.coverImage
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    return FileResponse(path_img+nama_image)
-
-###################  Health Facility
-
-# semua facility
-@app.get("/health_facility/", response_model=list[schemas.HealthFacility])
-def read_all_health_facility(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    healthFacility = crud.get_all_health_facilities(db)
-    return healthFacility
-
-# Get Health Facility by ID
-@app.get("/health_facility_id/{facility_id}", response_model = schemas.HealthFacility)
-def read_health_facility(facility_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    facility = crud.get_health_facility_by_id(db, facility_id)
-    return facility
-
-# health facility picture
-@app.get("/health_facility_picture/{health_facility_id}")
-def read_health_facility_image(health_facility_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    health_facility = crud.get_health_facility_by_id(db,health_facility_id)
-    if not(health_facility):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = '../img/healthFacility/foto/'
-    nama_image = health_facility.fotoFaskes
-    # print(path_img+nama_image)
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    return FileResponse(path_img+nama_image)
-
-# health facility logo
-@app.get("/health_facility_logo/{health_facility_id}")
-def read_health_facility_image(health_facility_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    health_facility = crud.get_health_facility_by_id(db,health_facility_id)
-    if not(health_facility):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = '../img/healthFacility/logo/'
-    nama_image = health_facility.logoFaskes
-    # print(path_img + nama_image)
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    return FileResponse(path_img+nama_image)
-
-###################  referral #############
-
-# create referral
-@app.post("/referral/{profile_id}", response_model=schemas.Referral)
-def create_referral(profile_id: int, referral: schemas.ReferralCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-
-    if referral["profile_id"] != profile_id:
-        raise HTTPException(status_code=401, detail="Unauthorized access to create referral")
-
-    return crud.create_referral(db=db, referral=referral)
-
-# read referral by id
-@app.get("/referral/{referral_id}", response_model=schemas.Referral)
-def read_referral_by_id(referral_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    referral = crud.get_referral(db, referral_id)
-
-    if referral is None:
-        raise HTTPException(status_code=404, detail="Referral not found")
-    
-    return referral
-
-###################  relasiDokterRsPoli #############
-
-# Get all RelasiDokterRsPoli
-@app.get("/relasi_dokter_rs_poli/", response_model=list[schemas.RelasiDokterRsPoli])
-def read_all_relasi_dokter_rs_poli(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_dokter_rs_poli = crud.get_all_relasi_dokter_rs_poli(db)
-    return relasi_dokter_rs_poli
-
-# Get RelasiDokterRsPoli by doctor id
-@app.get("/relasi_dokter_rs_poli_doctor_id/{doctor_id}", response_model=list[schemas.RelasiDokterRsPoli])
-def read_all_relasi_dokter_rs_poli(doctor_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_dokter_rs_poli = crud.get_relasi_dokter_rs_poli_doctor_id(db, doctor_id)
-    if not relasi_dokter_rs_poli:
-        raise HTTPException(status_code=404, detail= f"RelasiDokterRsPoli not found with doctor_id = {doctor_id}")
-    return relasi_dokter_rs_poli
-
-# Get RelasiDokterRsPoli by relasirspoli id
-@app.get("/relasi_dokter_rs_poli_relasirspoli_id/{relasirspoli_id}", response_model=list[schemas.RelasiDokterRsPoli])
-def read_all_relasi_dokter_rs_poli(relasirspoli_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_dokter_rs_poli = crud.get_relasi_dokter_rs_poli_relasirspoli_id(db, relasirspoli_id)
-    if not relasi_dokter_rs_poli:
-        raise HTTPException(status_code=404, detail= f"RelasiDokterRsPoli not found with relasirspoli_id = {relasirspoli_id}")
-    return relasi_dokter_rs_poli
-
-# Get RelasiDokterRsPoli by ID
-@app.get("/relasi_dokter_rs_poli/{relasi_dokter_rs_poli_id}", response_model=schemas.RelasiDokterRsPoli)
-def read_relasi_dokter_rs_poli(relasi_dokter_rs_poli_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_dokter_rs_poli = crud.get_relasi_dokter_rs_poli(db, relasi_dokter_rs_poli_id)
-    if relasi_dokter_rs_poli is None:
-        raise HTTPException(status_code=404, detail="RelasiDokterRsPoli not found")
-    return relasi_dokter_rs_poli
-
-###################  relasiJudulPoli #############
-
-# Get all RelasiJudulPoli
-@app.get("/relasi_judul_poli/", response_model=list[schemas.RelasiJudulPoli])
-def read_all_relasi_judul_poli(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_judul_poli = crud.get_all_relasi_judul_poli(db)
-    return relasi_judul_poli
-
-# Get relasijudulpoli by poli_id
-@app.get("/relasi_judul_poli_id/{poly_id}", response_model=list[schemas.RelasiJudulPoli])
-def read_all_relasi_judul_poli_id(poly_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_judul_poli = crud.get_relasi_judul_poli_id(db, poly_id)
-    if not relasi_judul_poli:
-        raise HTTPException(status_code=404, detail= f"RelasiDokterRsPoli not found with poly_id = {poly_id}")
-    return relasi_judul_poli
-
-# Get RelasiJudulPoli by ID
-@app.get("/relasi_judul_poli/{relasi_judul_poli_id}", response_model=schemas.RelasiJudulPoli)
-def read_relasi_judul_poli(relasi_judul_poli_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_judul_poli = crud.get_relasi_judul_poli(db, relasi_judul_poli_id)
-    if relasi_judul_poli is None:
-        raise HTTPException(status_code=404, detail="RelasiJudulPoli not found")
-    return relasi_judul_poli
-
-###################  relasiRSPoli #############
-
-# Get all RelasiRsPoli
-@app.get("/relasi_rs_poli/", response_model=list[schemas.RelasiRsPoli])
-def read_all_relasi_rs_poli(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_rs_poli = crud.get_all_relasi_rs_poli(db)
-    return relasi_rs_poli
-
-# Get relasirspoli by rs_id
-@app.get("/relasi_rs_poli_rs_id/{rs_id}", response_model=list[schemas.RelasiRsPoli])
-def read_all_relasi_rs_poli_rs_id(rs_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_rs_poli = crud.get_relasi_rs_poli_rs_id(db, rs_id)
-    if not relasi_rs_poli:
-        raise HTTPException(status_code=404, detail= f"RelasiRsPoli not found with rs_id = {rs_id}")
-    return relasi_rs_poli
-
-# Get relasirspoli by poli_id
-@app.get("/relasi_rs_poli_id/{poly_id}", response_model=list[schemas.RelasiRsPoli])
-def read_all_relasi_rs_poli_id(poly_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_rs_poli = crud.get_relasi_rs_poli_id(db, poly_id)
-    if not relasi_rs_poli:
-        raise HTTPException(status_code=404, detail= f"RelasiRsPoli not found with poly_id = {poly_id}")
-    return relasi_rs_poli
-
-# Get RelasiRsPoli by ID
-@app.get("/relasi_rs_poli/{relasi_rs_poli_id}", response_model=schemas.RelasiRsPoli)
-def read_relasi_rs_poli(relasi_rs_poli_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-
-    relasi_rs_poli = crud.get_relasi_rs_poli(db, relasi_rs_poli_id)
-    if relasi_rs_poli is None:
-        raise HTTPException(status_code=404, detail="RelasiRsPoli not found")
-    return relasi_rs_poli
-
-#######################################################################################################
-
-###################  review #############
-
-# create review
 @app.post("/review/", response_model=schemas.Review)
-def review(review: schemas.Review, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db)):
+    return crud.create_review(db=db, review=review)
 
-    return crud.review(db=db, review=review)
+@app.get("/review/{review_id}", response_model=schemas.Review)
+def read_review(review_id: int, db: Session = Depends(get_db)):
+    db_review = crud.get_review(db, review_id=review_id)
+    if db_review is None:
+        raise HTTPException(status_code=404, detail="Review not found")
+    return db_review
 
-# read review by doctor id
-@app.get("/review_doctor/{doctor_id}", response_model=list[schemas.Review])
-def read_review_doctor(doctor_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    review_doc = crud.get_reviews_by_doctor_id(db, doctor_id)
-    return review_doc
+@app.put("/review/{review_id}", response_model=schemas.Review)
+def update_review(review_id: int, review: schemas.ReviewUpdate, db: Session = Depends(get_db)):
+    return crud.update_review(db=db, review_id=review_id, review=review)
 
-# read review by facility id
-@app.get("/review_facility/{facility_id}", response_model=list[schemas.Review])
-def read_review_facility(facility_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    review_fac = crud.get_reviews_by_facility_id(db, facility_id)
-    return review_fac
+@app.delete("/review/{review_id}")
+def delete_review(review_id: int, db: Session = Depends(get_db)):
+    crud.delete_review(db, review_id=review_id)
+    return {"message": "Review deleted"}
 
-###################  service #############
+# -------------------- PESANAN CRUD Endpoints --------------------
 
-# semua service
-@app.get("/services/", response_model=list[schemas.Service])
-def read_services(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)): # db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)
-    usr =  verify_token(token)
-    service = crud.get_all_services(db)
-    return service
+@app.post("/pesanan/", response_model=schemas.Pesanan)
+def create_pesanan(pesanan: schemas.PesananCreate, db: Session = Depends(get_db)):
+    return crud.create_pesanan(db=db, pesanan=pesanan)
 
-# image service by id
-@app.get("/service_images/{service_id}")
-def read_services_image(service_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    service = crud.get_service_by_id(db,service_id)
-    if not(service):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = "../img/service_icon/"
-    nama_image = service.icon
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    return FileResponse(path_img+nama_image)
+@app.get("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
+def read_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
+    db_pesanan = crud.get_pesanan(db, pesanan_id=pesanan_id)
+    if db_pesanan is None:
+        raise HTTPException(status_code=404, detail="Pesanan not found")
+    return db_pesanan
 
-###################  specialist and polyclinic
+@app.put("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
+def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session = Depends(get_db)):
+    return crud.update_pesanan(db=db, pesanan_id=pesanan_id, pesanan=pesanan)
 
-# semua specialist and polyclinic
-@app.get("/specialist_and_polyclinic/", response_model=list[schemas.SpecialistAndPolyclinic])
-def read_specialist_and_polyclinic(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)): # db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)
-    usr =  verify_token(token)
-    specialist_and_polyclinic = crud.get_all_specialist_and_polyclinics(db)
-    if not specialist_and_polyclinic:
-        raise HTTPException(status_code=404, detail="no specialist and polyclinic found")
-    return specialist_and_polyclinic
+@app.delete("/pesanan/{pesanan_id}")
+def delete_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
+    crud.delete_pesanan(db, pesanan_id=pesanan_id)
+    return {"message": "Pesanan deleted"}
 
-# specialist and poly by id
-@app.get("/specialist_and_polyclinic/{specialist_and_polyclinic_id}", response_model=schemas.SpecialistAndPolyclinic)
-def read_profile_specialist_and_polyclinic_id(specialist_and_polyclinic_id : int, db: Session = Depends(get_db), token : str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    specialist_and_polyclinic = crud.get_polyclinic_by_id(db, specialist_and_polyclinic_id)
-    if specialist_and_polyclinic is None:
-        raise HTTPException(status_code=404, detail=f"no specialist and polyclinic found with id = {specialist_and_polyclinic_id}")
-    return crud.get_polyclinic_by_id(db, specialist_and_polyclinic_id)
+# -------------------- KATEGORI CRUD Endpoints --------------------
 
-# image specialist and polyclinic berdasarkan id
-@app.get("/specialist_and_polyclinic_images/{specialist_and_polyclinic_id}")
-def read_spe_image(specialist_and_polyclinic_id:int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token)
-    specialist_and_polyclinic = crud.get_polyclinic_by_id(db,specialist_and_polyclinic_id)
-    if not(specialist_and_polyclinic):
-        raise HTTPException(status_code=404, detail="id tidak valid")
-    path_img = "../img/specialist_and_polyclinic/"
-    nama_image =  specialist_and_polyclinic.icon
-    if not(path.exists(path_img + nama_image)):
-        raise HTTPException(status_code=404, detail="File dengan nama tersebut tidak ditemukan")
-    
-    fr =  FileResponse(path_img+nama_image)
-    return fr
+@app.post("/kategori/", response_model=schemas.Kategori)
+def create_kategori(kategori: schemas.KategoriCreate, db: Session = Depends(get_db)):
+    return crud.create_kategori(db=db, kategori=kategori)
 
-###################  medical record
+@app.get("/kategori/{kategori_id}", response_model=schemas.Kategori)
+def read_kategori(kategori_id: int, db: Session = Depends(get_db)):
+    db_kategori = crud.get_kategori(db, kategori_id=kategori_id)
+    if db_kategori is None:
+        raise HTTPException(status_code=404, detail="Kategori not found")
+    return db_kategori
 
-# medical record by id
-@app.get("/medical_record/{medical_record_id}", response_model=schemas.MedicalRecord)
-def read_medical_record_id(medical_record_id : int, db: Session = Depends(get_db), token : str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    medical_record = crud.get_medical_record(db, medical_record_id)
-    if medical_record is None:
-        raise HTTPException(status_code=404, detail=f"no medical record found with medical_record_id = {medical_record_id}")
-    return medical_record
+@app.put("/kategori/{kategori_id}", response_model=schemas.Kategori)
+def update_kategori(kategori_id: int, kategori: schemas.KategoriUpdate, db: Session = Depends(get_db)):
+    return crud.update_kategori(db=db, kategori_id=kategori_id, kategori=kategori)
 
-# medical record by profile id
-@app.get("/medical_record_profile/{profile_id}", response_model=list[schemas.MedicalRecord])
-def read_medical_record_profile(profile_id : int, db: Session = Depends(get_db), token : str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    medical_record_profile = crud.get_medical_records_by_profile_id(db, profile_id)
-    if not medical_record_profile:
-        raise HTTPException(status_code=404, detail=f"no medical record found with profile_id = {profile_id}")
-    return medical_record_profile
+@app.delete("/kategori/{kategori_id}")
+def delete_kategori(kategori_id: int, db: Session = Depends(get_db)):
+    crud.delete_kategori(db, kategori_id=kategori_id)
+    return {"message": "Kategori deleted"}
 
-# medical record by appointment id
-@app.get("/medical_record_appointment/{appointment_id}", response_model=schemas.MedicalRecord)
-def read_medical_record_appointment(appointment_id : int, db: Session = Depends(get_db), token : str = Depends(oauth2_scheme)):
-    usr = verify_token(token)
-    medical_record_appointment = crud.get_medical_records_by_appointment_id(db, appointment_id)
-    if medical_record_appointment is None:
-        raise HTTPException(status_code=404, detail=f"no medical record found with appointment_id = {appointment_id}")
-    return medical_record_appointment
+# -------------------- METODE CRUD Endpoints --------------------
 
-#create medical record
-@app.post("/create_medical_record/")
-def create_medical_record(medical_record: schemas.MedicalRecordCreate, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    
-    ## pake ini buat verify session nya
-    # usr = verify_token(token)
+@app.post("/metode/", response_model=schemas.Metode)
+def create_metode(metode: schemas.MetodeCreate, db: Session = Depends(get_db)):
+    return crud.create_metode(db=db, metode=metode)
 
-    # if usr["profile_id"] != profile_id:
-    #     raise HTTPException(status_code=401, detail="Unauthorized access to create profile")
+@app.get("/metode/{metode_id}", response_model=schemas.Metode)
+def read_metode(metode_id: int, db: Session = Depends(get_db)):
+    db_metode = crud.get_metode(db, metode_id=metode_id)
+    if db_metode is None:
+        raise HTTPException(status_code=404, detail="Metode not found")
+    return db_metode
 
-    return crud.create_medical_record(db, medical_record)
-    
-####################################################################################################
+@app.put("/metode/{metode_id}", response_model=schemas.Metode)
+def update_metode(metode_id: int, metode: schemas.MetodeUpdate, db: Session = Depends(get_db)):
+    return crud.update_metode(db=db, metode_id=metode_id, metode=metode)
+
+@app.delete("/metode/{metode_id}")
+def delete_metode(metode_id: int, db: Session = Depends(get_db)):
+    crud.delete_metode(db, metode_id=metode_id)
+    return {"message": "Metode deleted"}
+

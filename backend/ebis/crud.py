@@ -40,310 +40,151 @@ def hashPassword(passwd: str):
     return pwd_hash
 
 #######################################################################################################
-# profile
-
-# Create Profile
-def create_profile(db: Session, profile: schemas.ProfileCreate):
-    db_profile = models.Profile(**profile.model_dump())
-    db.add(db_profile)
+# PRODUK CRUD
+def create_produk(db: Session, produk: schemas.ProdukCreate):
+    db_produk = models.Produk(**produk.dict())
+    db.add(db_produk)
     db.commit()
-    db.refresh(db_profile)
-    return db_profile
+    db.refresh(db_produk)
+    return db_produk
 
-# Get Profile by profile id
-def get_profile(db: Session, profile_id: int):
-    return db.query(models.Profile).filter(models.Profile.id == profile_id).first()
+def get_produk(db: Session, produk_id: int):
+    return db.query(models.Produk).filter(models.Produk.id == produk_id).first()
 
-# Get Profile by User ID
-def get_profile_by_user_id(db: Session, user_id: int):
-    return db.query(models.Profile).filter(models.Profile.userId == user_id)
-
-# Update Profile
-def update_profile(db: Session, profile_id: int, profile: schemas.ProfileUpdate):
-    db_profile = db.query(models.Profile).filter(models.Profile.id == profile_id).first()
-    if db_profile:
-        for key, value in profile.model_dump(exclude_unset=True).items():
-            setattr(db_profile, key, value)
+def update_produk(db: Session, produk_id: int, produk: schemas.ProdukUpdate):
+    db_produk = db.query(models.Produk).filter(models.Produk.id == produk_id).first()
+    if db_produk:
+        for key, value in produk.dict(exclude_unset=True).items():
+            setattr(db_produk, key, value)
         db.commit()
-        db.refresh(db_profile)
-    return db_profile
+        db.refresh(db_produk)
+    return db_produk
 
-# Delete Profile
-def delete_profile(db: Session, profile_id: int):
-    db.query(models.Profile).filter(models.Profile.id == profile_id).delete()
+def delete_produk(db: Session, produk_id: int):
+    db.query(models.Produk).filter(models.Produk.id == produk_id).delete()
     db.commit()
-    return {"message": "Profile deleted successfully"}
 
 #######################################################################################################
-# profile relation
-
-# Get profile relation by ID
-def get_relation_id(db: Session, relation_id: int):
-    return db.query(models.ProfileRelation).filter(models.ProfileRelation.id == relation_id).first()
-
-# Get all profile relation
-def get_all_profile_relations(db: Session):
-    return db.query(models.ProfileRelation).all()
-
-#######################################################################################################
-# Doctor
-
-# Get Doctor by ID
-def get_doctor_id(db: Session, doctor_id: int):
-    return db.query(models.Doctor).filter(models.Doctor.id == doctor_id).first()
-
-# Get Doctor by poly ID
-def get_doctor_poly_id(db: Session, poly_id: int):
-    return db.query(models.Doctor).filter(models.Doctor.polyId == poly_id).all()
-
-# Get all doctors
-def get_all_doctors(db: Session):
-    return db.query(models.Doctor).all()
-
-#######################################################################################################
-# Doctor Schedule
-
-# Create Doctor Schedule
-def create_doctor_schedule(db: Session, doctorSchedule: schemas.DoctorScheduleCreate):
-    db_doctorSchedule = models.DoctorSchedule(**doctorSchedule.model_dump())
-    db.add(db_doctorSchedule)
+# KERANJANG CRUD
+def create_keranjang(db: Session, keranjang: schemas.keranjangCreate):
+    db_keranjang = models.Keranjang(**keranjang.dict())
+    db.add(db_keranjang)
     db.commit()
-    db.refresh(db_doctorSchedule)
-    return db_doctorSchedule
+    db.refresh(db_keranjang)
+    return db_keranjang
 
-# Update Doctor Schedule
-def update_doctor_schedule(db: Session, doctor_schedule_id: int, doctorSchedule: schemas.DoctorScheduleUpdate):
-    db_doctorSchedule = db.query(models.DoctorSchedule).filter(models.DoctorSchedule.id == doctor_schedule_id).first()
-    if db_doctorSchedule:
-        for key, value in doctorSchedule.model_dump(exclude_unset=True).items():
-            setattr(db_doctorSchedule, key, value)
+def get_keranjang(db: Session, keranjang_id: int):
+    return db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).first()
+
+def update_keranjang(db: Session, keranjang_id: int, keranjang: schemas.keranjangUpdate):
+    db_keranjang = db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).first()
+    if db_keranjang:
+        for key, value in keranjang.dict(exclude_unset=True).items():
+            setattr(db_keranjang, key, value)
         db.commit()
-        db.refresh(db_doctorSchedule)
-    return db_doctorSchedule
+        db.refresh(db_keranjang)
+    return db_keranjang
 
-# Get Doctor Schedule by ID
-def get_doctor_schedule_id(db: Session, doctorSchedule_id: int):
-    return db.query(models.DoctorSchedule).filter(models.DoctorSchedule.id == doctorSchedule_id).first()
-
-# Get Doctor Schedule by doctor ID
-def get_doctor_schedule_doctor_id(db: Session, doctor_id: int):
-    return db.query(models.DoctorSchedule).filter(models.DoctorSchedule.doctorId == doctor_id).all()
-
-# Get all doctors
-def get_all_doctor_schedules(db: Session):
-    return db.query(models.DoctorSchedule).all()
-
-#######################################################################################################
-# Appointments
-
-# Create Appointment
-def create_appointment(db: Session, appointment: schemas.AppointmentCreate):
-    db_appointment = models.Appointment(**appointment.model_dump())
-    db.add(db_appointment)
+def delete_keranjang(db: Session, keranjang_id: int):
+    db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).delete()
     db.commit()
-    db.refresh(db_appointment)
-    return db_appointment
-
-# Get Appointment
-def get_appointment(db: Session, appointment_id: int):
-    return db.query(models.Appointment).\
-            options(joinedload(models.Appointment.doctor), joinedload(models.Appointment.facility)).\
-            filter(models.Appointment.id == appointment_id).first()
-
-# Get Appointments by Profile ID
-def get_appointments_by_profile_id(db: Session, profile_id: int):
-    return db.query(models.Appointment).\
-            options(joinedload(models.Appointment.doctor), joinedload(models.Appointment.facility)).\
-            filter(models.Appointment.patientId == profile_id).all()
-
-# Update Appointment
-def update_appointment(db: Session, appointment_id: int, appointment: schemas.AppointmentUpdate):
-    db_appointment = db.query(models.Appointment).filter(models.Appointment.id == appointment_id).first()
-    if db_appointment:
-        for key, value in appointment.model_dump(exclude_unset=True).items():
-            setattr(db_appointment, key, value)
-        db.commit()
-        db.refresh(db_appointment)
-    return db_appointment
-
-# Delete Appointment
-def delete_appointment(db: Session, appointment_id: int):
-    db.query(models.Appointment).filter(models.Appointment.id == appointment_id).delete()
-    db.commit()
-    return {"message": "Appointment deleted successfully"}
-
-# Get all Appointments
-def get_all_appointments(db: Session):
-    return db.query(models.Appointment).all()
 
 #######################################################################################################
-# Articles
-
-# Get Health Article by ID
-def get_health_article(db: Session, article_id: int):
-    return db.query(models.HealthArticle).filter(models.HealthArticle.id == article_id).first()
-
-# Get all Health Articles
-def get_all_health_articles(db: Session):
-    return db.query(models.HealthArticle).all()
-
-#######################################################################################################
-# health facility
-
-# Get Health Facility by ID
-def get_health_facility_by_id(db: Session, facility_id: int):
-    return db.query(models.HealthFacility).filter(models.HealthFacility.id == facility_id).first()
-
-# Get all Health Facilities
-def get_all_health_facilities(db: Session):
-    return db.query(models.HealthFacility).all()
-
-#######################################################################################################
-# medical records
-
-# Get Medical Records by Profile ID
-def get_medical_records_by_profile_id(db: Session, profile_id: int):
-    return db.query(models.MedicalRecord).filter(models.MedicalRecord.patientId == profile_id).all()
-
-# Get Medical Records by appointment ID
-def get_medical_records_by_appointment_id(db: Session, appointment_id: int):
-    return db.query(models.MedicalRecord).filter(models.MedicalRecord.appointmentId == appointment_id).first()
-
-# Get Medical Record by ID
-def get_medical_record(db: Session, record_id: int):
-    return db.query(models.MedicalRecord).filter(models.MedicalRecord.id == record_id).first()
-
-# Create Medical Record
-def create_medical_record(db: Session, medical_record: schemas.MedicalRecordCreate):
-    db_medical_record = models.MedicalRecord(**medical_record.model_dump())
-    db.add(db_medical_record)
-    db.commit()
-    db.refresh(db_medical_record)
-    return db_medical_record
-
-# Update Medical Record
-def update_medical_record(db: Session, record_id: int, record: schemas.MedicalRecordUpdate):
-    db_record = db.query(models.MedicalRecord).filter(models.MedicalRecord.id == record_id).first()
-    if db_record:
-        for key, value in record.model_view(exclude_unset=True).items():
-            setattr(db_record, key, value)
-        db.commit()
-        db.refresh(db_record)
-    return db_record
-
-#######################################################################################################
-# referral
-
-# Create Referral
-def create_referral(db: Session, referral: schemas.ReferralCreate):
-    db_referral = models.Referral(**referral.model_dump())
-    db.add(db_referral)
-    db.commit()
-    db.refresh(db_referral)
-    return db_referral
-
-# Get referral by ID
-def get_referral(db: Session, referral_id: int):
-    return db.query(models.Referral).filter(models.Referral.id == referral_id).first()
-
-#######################################################################################################
-# relasiDokterRsPoli
-
-# Get RelasiDokterRsPoli by ID
-def get_relasi_dokter_rs_poli(db: Session, relasi_dokter_rs_poli_id: int):
-    return db.query(models.RelasiDokterRsPoli).filter(models.RelasiDokterRsPoli.id == relasi_dokter_rs_poli_id).first()
-
-# Get RelasiDokterRsPoli by doctorID
-def get_relasi_dokter_rs_poli_doctor_id(db: Session, doctor_id: int):
-    return db.query(models.RelasiDokterRsPoli).filter(models.RelasiDokterRsPoli.doctorId == doctor_id).all()
-
-# Get RelasiDokterRsPoli by relasi rs poli id
-def get_relasi_dokter_rs_poli_relasirspoli_id(db: Session, relasirspoli_id: int):
-    return db.query(models.RelasiDokterRsPoli).filter(models.RelasiDokterRsPoli.relasiRsPoliId == relasirspoli_id).all()
-
-# Get all RelasiDokterRsPoli
-def get_all_relasi_dokter_rs_poli(db: Session):
-    return db.query(models.RelasiDokterRsPoli).all()
-
-#######################################################################################################
-# relasiJudulPoli
-
-# Get RelasiJudulPoli by ID
-def get_relasi_judul_poli(db: Session, relasi_judul_poli_id: int):
-    return db.query(models.RelasiJudulPoli).filter(models.RelasiJudulPoli.id == relasi_judul_poli_id).first()
-
-# Get RelasiJudulPoli by poly ID
-def get_relasi_judul_poli_id(db: Session, poli_id: int):
-    return db.query(models.RelasiJudulPoli).filter(models.RelasiJudulPoli.polyclinicId == poli_id).all()
-
-# Get all RelasiJudulPoli
-def get_all_relasi_judul_poli(db: Session):
-    return db.query(models.RelasiJudulPoli).all()
-
-#######################################################################################################
-# relasiRsPoli
-
-# Get RelasiRsPoli by ID
-def get_relasi_rs_poli(db: Session, relasi_rs_poli_id: int):
-    return db.query(models.RelasiRsPoli).filter(models.RelasiRsPoli.id == relasi_rs_poli_id).first()
-
-# Get RelasiRsPoli by poly ID
-def get_relasi_rs_poli_id(db: Session, poli_id: int):
-    return db.query(models.RelasiRsPoli).filter(models.RelasiRsPoli.poliId == poli_id).all()
-
-# Get RelasiRsPoli by rs ID
-def get_relasi_rs_poli_rs_id(db: Session, rs_id: int):
-    return db.query(models.RelasiRsPoli).filter(models.RelasiRsPoli.rsId == rs_id).all()
-
-# Get all RelasiRsPoli
-def get_all_relasi_rs_poli(db: Session):
-    return db.query(models.RelasiRsPoli).all()
-
-#######################################################################################################
-# review
-
-# Create Review
-def create_review(db: Session, review: schemas.ReviewCreate):
-    db_review = models.Review(**review.model_view())
+# REVIEW CRUD
+def create_review(db: Session, review: schemas.reviewCreate):
+    db_review = models.Review(**review.dict())
     db.add(db_review)
     db.commit()
     db.refresh(db_review)
     return db_review
 
-# Get Review by ID
 def get_review(db: Session, review_id: int):
     return db.query(models.Review).filter(models.Review.id == review_id).first()
 
-# Get all Reviews
-def get_all_reviews(db: Session):
-    return db.query(models.Review).all()
+def update_review(db: Session, review_id: int, review: schemas.reviewUpdate):
+    db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
+    if db_review:
+        for key, value in review.dict(exclude_unset=True).items():
+            setattr(db_review, key, value)
+        db.commit()
+        db.refresh(db_review)
+    return db_review
 
-# Get Reviews by Doctor ID
-def get_reviews_by_doctor_id(db: Session, doctor_id: int):
-    return db.query(models.Review).filter(models.Review.revieweeDoctorId == doctor_id).all()
-
-# Get Reviews by Facility (Faskes) ID
-def get_reviews_by_facility_id(db: Session, facility_id: int):
-    return db.query(models.Review).filter(models.Review.revieweeFaskesId == facility_id).all()
-
-#######################################################################################################
-# service
-
-# Get all services
-def get_all_services(db: Session):
-    return db.query(models.Services).all()
-
-# Get Service by ID
-def get_service_by_id(db: Session, service_id: int):
-    return db.query(models.Services).filter(models.Services.id == service_id).first()
+def delete_review(db: Session, review_id: int):
+    db.query(models.Review).filter(models.Review.id == review_id).delete()
+    db.commit()
 
 #######################################################################################################
-# polyclinic
+# PESANAN CRUD
+def create_pesanan(db: Session, pesanan: schemas.pesananCreate):
+    db_pesanan = models.Pesanan(**pesanan.dict())
+    db.add(db_pesanan)
+    db.commit()
+    db.refresh(db_pesanan)
+    return db_pesanan
 
-# Get all polyclinic
-def get_all_specialist_and_polyclinics(db: Session):
-    return db.query(models.SpecialistAndPolyclinic).all()
+def get_pesanan(db: Session, pesanan_id: int):
+    return db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).first()
 
-# Get Polyclinic by ID
-def get_polyclinic_by_id(db: Session, polyclinic_id: int):
-    return db.query(models.SpecialistAndPolyclinic).filter(models.SpecialistAndPolyclinic.id == polyclinic_id).first()
+def update_pesanan(db: Session, pesanan_id: int, pesanan: schemas.pesananUpdate):
+    db_pesanan = db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).first()
+    if db_pesanan:
+        for key, value in pesanan.dict(exclude_unset=True).items():
+            setattr(db_pesanan, key, value)
+        db.commit()
+        db.refresh(db_pesanan)
+    return db_pesanan
+
+def delete_pesanan(db: Session, pesanan_id: int):
+    db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).delete()
+    db.commit()
+
+#######################################################################################################
+# KATEGORI CRUD
+def create_kategori(db: Session, kategori: schemas.kategoriCreate):
+    db_kategori = models.Kategori(**kategori.dict())
+    db.add(db_kategori)
+    db.commit()
+    db.refresh(db_kategori)
+    return db_kategori
+
+def get_kategori(db: Session, kategori_id: int):
+    return db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
+
+def update_kategori(db: Session, kategori_id: int, kategori: schemas.kategoriUpdate):
+    db_kategori = db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
+    if db_kategori:
+        for key, value in kategori.dict(exclude_unset=True).items():
+            setattr(db_kategori, key, value)
+        db.commit()
+        db.refresh(db_kategori)
+    return db_kategori
+
+def delete_kategori(db: Session, kategori_id: int):
+    db.query(models.Kategori).filter(models.Kategori.id == kategori_id).delete()
+    db.commit()
+
+#######################################################################################################
+# METODE CRUD
+def create_metode(db: Session, metode: schemas.metodeCreate):
+    db_metode = models.Metode(**metode.dict())
+    db.add(db_metode)
+    db.commit()
+    db.refresh(db_metode)
+    return db_metode
+
+def get_metode(db: Session, metode_id: int):
+    return db.query(models.Metode).filter(models.Metode.id == metode_id).first()
+
+def update_metode(db: Session, metode_id: int, metode: schemas.metodeUpdate):
+    db_metode = db.query(models.Metode).filter(models.Metode.id == metode_id).first()
+    if db_metode:
+        for key, value in metode.dict(exclude_unset=True).items():
+            setattr(db_metode, key, value)
+        db.commit()
+        db.refresh(db_metode)
+    return db_metode
+
+def delete_metode(db: Session, metode_id: int):
+    db.query(models.Metode).filter(models.Metode.id == metode_id).delete()
+    db.commit()
