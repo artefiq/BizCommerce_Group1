@@ -51,6 +51,9 @@ def create_produk(db: Session, produk: schemas.ProdukCreate):
 def get_produk(db: Session, produk_id: int):
     return db.query(models.Produk).filter(models.Produk.id == produk_id).first()
 
+def get_all_produk(db: Session):
+    return db.query(models.Produk).all()
+
 def update_produk(db: Session, produk_id: int, produk: schemas.ProdukUpdate):
     db_produk = db.query(models.Produk).filter(models.Produk.id == produk_id).first()
     if db_produk:
@@ -75,6 +78,9 @@ def create_keranjang(db: Session, keranjang: schemas.keranjangCreate):
 
 def get_keranjang(db: Session, keranjang_id: int):
     return db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).first()
+
+def get_all_keranjang(db: Session):
+    return db.query(models.keranjang).all()
 
 def update_keranjang(db: Session, keranjang_id: int, keranjang: schemas.keranjangUpdate):
     db_keranjang = db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).first()
@@ -101,6 +107,9 @@ def create_review(db: Session, review: schemas.reviewCreate):
 def get_review(db: Session, review_id: int):
     return db.query(models.Review).filter(models.Review.id == review_id).first()
 
+def get_all_review(db: Session):
+    return db.query(models.review).all()
+
 def update_review(db: Session, review_id: int, review: schemas.reviewUpdate):
     db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if db_review:
@@ -125,6 +134,9 @@ def create_pesanan(db: Session, pesanan: schemas.pesananCreate):
 
 def get_pesanan(db: Session, pesanan_id: int):
     return db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).first()
+
+def get_all_pesanan(db: Session):
+    return db.query(models.pesanan).all()
 
 def update_pesanan(db: Session, pesanan_id: int, pesanan: schemas.pesananUpdate):
     db_pesanan = db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).first()
@@ -151,6 +163,9 @@ def create_kategori(db: Session, kategori: schemas.kategoriCreate):
 def get_kategori(db: Session, kategori_id: int):
     return db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
 
+def get_all_kategori(db: Session):
+    return db.query(models.kategori).all()
+
 def update_kategori(db: Session, kategori_id: int, kategori: schemas.kategoriUpdate):
     db_kategori = db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
     if db_kategori:
@@ -175,6 +190,9 @@ def create_metode(db: Session, metode: schemas.metodeCreate):
 
 def get_metode(db: Session, metode_id: int):
     return db.query(models.Metode).filter(models.Metode.id == metode_id).first()
+
+def get_all_metode(db: Session):
+    return db.query(models.metode).all()
 
 def update_metode(db: Session, metode_id: int, metode: schemas.metodeUpdate):
     db_metode = db.query(models.Metode).filter(models.Metode.id == metode_id).first()

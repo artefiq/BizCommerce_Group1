@@ -27,6 +27,8 @@ from jose import jwt
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile
 
+from typing import List
+
 
 app = FastAPI(title="Web service uts e business",
     description="Web service uts kelompok 1 2024",
@@ -157,10 +159,12 @@ UPLOAD_DIRECTORY = "./../img"
 
 # -------------------- PRODUK CRUD Endpoints --------------------
 
+# create produk
 @app.post("/produk/", response_model=schemas.Produk)
 def create_produk(produk: schemas.ProdukCreate, db: Session = Depends(get_db)):
     return crud.create_produk(db=db, produk=produk)
 
+# read produk
 @app.get("/produk/{produk_id}", response_model=schemas.Produk)
 def read_produk(produk_id: int, db: Session = Depends(get_db)):
     db_produk = crud.get_produk(db, produk_id=produk_id)
@@ -168,10 +172,17 @@ def read_produk(produk_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Produk not found")
     return db_produk
 
+# read all produk
+@app.get("/produk/", response_model=List[schemas.Produk])
+def read_all_produk(db: Session = Depends(get_db)):
+    return crud.get_all_produk(db)
+
+# update produk
 @app.put("/produk/{produk_id}", response_model=schemas.Produk)
 def update_produk(produk_id: int, produk: schemas.ProdukUpdate, db: Session = Depends(get_db)):
     return crud.update_produk(db=db, produk_id=produk_id, produk=produk)
 
+# delete produk
 @app.delete("/produk/{produk_id}")
 def delete_produk(produk_id: int, db: Session = Depends(get_db)):
     crud.delete_produk(db, produk_id=produk_id)
@@ -179,19 +190,23 @@ def delete_produk(produk_id: int, db: Session = Depends(get_db)):
 
 # -------------------- KERANJANG CRUD Endpoints --------------------
 
-@app.post("/keranjang/", response_model=schemas.Keranjang)
-def create_keranjang(keranjang: schemas.KeranjangCreate, db: Session = Depends(get_db)):
+@app.post("/keranjang/", response_model=schemas.keranjang)
+def create_keranjang(keranjang: schemas.keranjangCreate, db: Session = Depends(get_db)):
     return crud.create_keranjang(db=db, keranjang=keranjang)
 
-@app.get("/keranjang/{keranjang_id}", response_model=schemas.Keranjang)
+@app.get("/keranjang/{keranjang_id}", response_model=schemas.keranjang)
 def read_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
     db_keranjang = crud.get_keranjang(db, keranjang_id=keranjang_id)
     if db_keranjang is None:
         raise HTTPException(status_code=404, detail="Keranjang not found")
     return db_keranjang
 
-@app.put("/keranjang/{keranjang_id}", response_model=schemas.Keranjang)
-def update_keranjang(keranjang_id: int, keranjang: schemas.KeranjangUpdate, db: Session = Depends(get_db)):
+@app.get("/keranjang/", response_model=List[schemas.keranjang])
+def read_all_keranjang(db: Session = Depends(get_db)):
+    return crud.get_all_keranjang(db)
+
+@app.put("/keranjang/{keranjang_id}", response_model=schemas.keranjang)
+def update_keranjang(keranjang_id: int, keranjang: schemas.keranjangUpdate, db: Session = Depends(get_db)):
     return crud.update_keranjang(db=db, keranjang_id=keranjang_id, keranjang=keranjang)
 
 @app.delete("/keranjang/{keranjang_id}")
@@ -201,19 +216,23 @@ def delete_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
 
 # -------------------- REVIEW CRUD Endpoints --------------------
 
-@app.post("/review/", response_model=schemas.Review)
-def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db)):
+@app.post("/review/", response_model=schemas.review)
+def create_review(review: schemas.reviewCreate, db: Session = Depends(get_db)):
     return crud.create_review(db=db, review=review)
 
-@app.get("/review/{review_id}", response_model=schemas.Review)
+@app.get("/review/{review_id}", response_model=schemas.review)
 def read_review(review_id: int, db: Session = Depends(get_db)):
     db_review = crud.get_review(db, review_id=review_id)
     if db_review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     return db_review
 
-@app.put("/review/{review_id}", response_model=schemas.Review)
-def update_review(review_id: int, review: schemas.ReviewUpdate, db: Session = Depends(get_db)):
+@app.get("/review/", response_model=List[schemas.review])
+def read_all_review(db: Session = Depends(get_db)):
+    return crud.get_all_review(db)
+
+@app.put("/review/{review_id}", response_model=schemas.review)
+def update_review(review_id: int, review: schemas.reviewUpdate, db: Session = Depends(get_db)):
     return crud.update_review(db=db, review_id=review_id, review=review)
 
 @app.delete("/review/{review_id}")
@@ -223,19 +242,23 @@ def delete_review(review_id: int, db: Session = Depends(get_db)):
 
 # -------------------- PESANAN CRUD Endpoints --------------------
 
-@app.post("/pesanan/", response_model=schemas.Pesanan)
-def create_pesanan(pesanan: schemas.PesananCreate, db: Session = Depends(get_db)):
+@app.post("/pesanan/", response_model=schemas.pesanan)
+def create_pesanan(pesanan: schemas.pesananCreate, db: Session = Depends(get_db)):
     return crud.create_pesanan(db=db, pesanan=pesanan)
 
-@app.get("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
+@app.get("/pesanan/{pesanan_id}", response_model=schemas.pesanan)
 def read_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
     db_pesanan = crud.get_pesanan(db, pesanan_id=pesanan_id)
     if db_pesanan is None:
         raise HTTPException(status_code=404, detail="Pesanan not found")
     return db_pesanan
 
-@app.put("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
-def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session = Depends(get_db)):
+@app.get("/pesanan/", response_model=List[schemas.pesanan])
+def read_all_pesanan(db: Session = Depends(get_db)):
+    return crud.get_all_pesanan(db)
+
+@app.put("/pesanan/{pesanan_id}", response_model=schemas.pesanan)
+def update_pesanan(pesanan_id: int, pesanan: schemas.pesananUpdate, db: Session = Depends(get_db)):
     return crud.update_pesanan(db=db, pesanan_id=pesanan_id, pesanan=pesanan)
 
 @app.delete("/pesanan/{pesanan_id}")
@@ -245,19 +268,23 @@ def delete_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
 
 # -------------------- KATEGORI CRUD Endpoints --------------------
 
-@app.post("/kategori/", response_model=schemas.Kategori)
-def create_kategori(kategori: schemas.KategoriCreate, db: Session = Depends(get_db)):
+@app.post("/kategori/", response_model=schemas.kategori)
+def create_kategori(kategori: schemas.kategoriCreate, db: Session = Depends(get_db)):
     return crud.create_kategori(db=db, kategori=kategori)
 
-@app.get("/kategori/{kategori_id}", response_model=schemas.Kategori)
+@app.get("/kategori/{kategori_id}", response_model=schemas.kategori)
 def read_kategori(kategori_id: int, db: Session = Depends(get_db)):
     db_kategori = crud.get_kategori(db, kategori_id=kategori_id)
     if db_kategori is None:
         raise HTTPException(status_code=404, detail="Kategori not found")
     return db_kategori
 
-@app.put("/kategori/{kategori_id}", response_model=schemas.Kategori)
-def update_kategori(kategori_id: int, kategori: schemas.KategoriUpdate, db: Session = Depends(get_db)):
+@app.get("/kategori/", response_model=List[schemas.kategori])
+def read_all_kategori(db: Session = Depends(get_db)):
+    return crud.get_all_kategori(db)
+
+@app.put("/kategori/{kategori_id}", response_model=schemas.kategori)
+def update_kategori(kategori_id: int, kategori: schemas.kategoriUpdate, db: Session = Depends(get_db)):
     return crud.update_kategori(db=db, kategori_id=kategori_id, kategori=kategori)
 
 @app.delete("/kategori/{kategori_id}")
@@ -267,19 +294,23 @@ def delete_kategori(kategori_id: int, db: Session = Depends(get_db)):
 
 # -------------------- METODE CRUD Endpoints --------------------
 
-@app.post("/metode/", response_model=schemas.Metode)
-def create_metode(metode: schemas.MetodeCreate, db: Session = Depends(get_db)):
+@app.post("/metode/", response_model=schemas.metode)
+def create_metode(metode: schemas.metodeCreate, db: Session = Depends(get_db)):
     return crud.create_metode(db=db, metode=metode)
 
-@app.get("/metode/{metode_id}", response_model=schemas.Metode)
+@app.get("/metode/{metode_id}", response_model=schemas.metode)
 def read_metode(metode_id: int, db: Session = Depends(get_db)):
     db_metode = crud.get_metode(db, metode_id=metode_id)
     if db_metode is None:
         raise HTTPException(status_code=404, detail="Metode not found")
     return db_metode
 
-@app.put("/metode/{metode_id}", response_model=schemas.Metode)
-def update_metode(metode_id: int, metode: schemas.MetodeUpdate, db: Session = Depends(get_db)):
+@app.get("/metode/", response_model=List[schemas.metode])
+def read_all_metode(db: Session = Depends(get_db)):
+    return crud.get_all_metode(db)
+
+@app.put("/metode/{metode_id}", response_model=schemas.metode)
+def update_metode(metode_id: int, metode: schemas.metodeUpdate, db: Session = Depends(get_db)):
     return crud.update_metode(db=db, metode_id=metode_id, metode=metode)
 
 @app.delete("/metode/{metode_id}")
