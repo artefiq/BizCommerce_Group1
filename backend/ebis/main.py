@@ -167,7 +167,7 @@ def create_profile(profile: schemas.ProfileCreate, db: Session = Depends(get_db)
 # read profile
 @app.get("/profile/{user_id}", response_model=schemas.Profile)
 def read_profile(user_id: int, db: Session = Depends(get_db)):
-    db_profile = crud.get_profile(db, user=user_id)
+    db_profile = crud.get_profile(db, user_id=user_id)
     if db_profile is None:
         raise HTTPException(status_code=404, detail="Profile not found")
     return db_profile

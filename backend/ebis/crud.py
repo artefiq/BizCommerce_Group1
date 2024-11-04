@@ -189,7 +189,7 @@ def get_kategori(db: Session, kategori_id: int):
     return db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
 
 def get_all_kategori(db: Session):
-    return db.query(models.kategori).all()
+    return db.query(models.Kategori).all()
 
 def update_kategori(db: Session, kategori_id: int, kategori: schemas.kategoriUpdate):
     db_kategori = db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
@@ -217,7 +217,7 @@ def get_metode(db: Session, metode_id: int):
     return db.query(models.Metode).filter(models.Metode.id == metode_id).first()
 
 def get_all_metode(db: Session):
-    return db.query(models.metode).all()
+    return db.query(models.Metode).all()
 
 def update_metode(db: Session, metode_id: int, metode: schemas.metodeUpdate):
     db_metode = db.query(models.Metode).filter(models.Metode.id == metode_id).first()

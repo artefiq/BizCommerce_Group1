@@ -49,10 +49,10 @@ class Profile(ProfileBase):
 ###############################
 # produk
 class ProdukBase(BaseModel):
-    kategori:str
+    kategori:int
     nama:str
     deskripsi:str
-    stok:str
+    stok:int
     harga:int
     gambar:str
     
