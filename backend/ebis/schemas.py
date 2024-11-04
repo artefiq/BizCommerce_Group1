@@ -22,12 +22,39 @@ class Token(BaseModel):
     token_type: str
 
 ###############################
+# profile 
+
+class ProfileBase(BaseModel):
+    user:int
+    role:str
+    nama:str
+    alamat:str
+    no_telp:str
+
+class ProfileCreate(ProfileBase):
+    pass
+
+class ProfileUpdate(ProfileBase):
+    pass
+
+class ProfileDelete(ProfileBase):
+    pass
+
+class Profile(ProfileBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+###############################
 # produk
 class ProdukBase(BaseModel):
     kategori:str
     nama:str
+    deskripsi:str
     stok:str
     harga:int
+    gambar:str
     
 class ProdukCreate(ProdukBase):
     pass
@@ -94,6 +121,7 @@ class review(reviewBase):
 class pesananBase(BaseModel):
     user:int
     produk:int
+    qty:int
     metode_bayar:int
     tanggal:str
     waktu:str

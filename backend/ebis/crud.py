@@ -40,9 +40,34 @@ def hashPassword(passwd: str):
     return pwd_hash
 
 #######################################################################################################
+# PROFILE CRUD
+def create_profile(db:Session, profile: schemas.ProfileCreate):
+    db_profile = models.Profile(**profile.model_dump())
+    db.add(db_profile)
+    db.commit()
+    db.refresh()
+    return db_profile
+
+def get_profile(db:Session, user_id: int):
+    return db.query(models.Profile).filter(models.Profile.user == user_id).first()
+
+def update_profile(db:Session, profile_id: int, profile: schemas.ProdukUpdate):
+    db_profile = db.query(models.Profile).filter(models.Profile.id == profile_id).first()
+    if db_profile:
+        for key, value in profile.model_dump(exclude_unset=True).items():
+            setattr(db_profile, key, value)
+        db.commit()
+        db.refresh()
+    return db_profile
+
+def delete_profile(db:Session, profile_id: int):
+    db.query(models.Profile).filter(models.Profile.id == profile_id).delete()
+    db.commit()
+
+#######################################################################################################
 # PRODUK CRUD
 def create_produk(db: Session, produk: schemas.ProdukCreate):
-    db_produk = models.Produk(**produk.dict())
+    db_produk = models.Produk(**produk.model_dump())
     db.add(db_produk)
     db.commit()
     db.refresh(db_produk)
@@ -57,7 +82,7 @@ def get_all_produk(db: Session):
 def update_produk(db: Session, produk_id: int, produk: schemas.ProdukUpdate):
     db_produk = db.query(models.Produk).filter(models.Produk.id == produk_id).first()
     if db_produk:
-        for key, value in produk.dict(exclude_unset=True).items():
+        for key, value in produk.model_dump(exclude_unset=True).items():
             setattr(db_produk, key, value)
         db.commit()
         db.refresh(db_produk)
@@ -70,7 +95,7 @@ def delete_produk(db: Session, produk_id: int):
 #######################################################################################################
 # KERANJANG CRUD
 def create_keranjang(db: Session, keranjang: schemas.keranjangCreate):
-    db_keranjang = models.Keranjang(**keranjang.dict())
+    db_keranjang = models.Keranjang(**keranjang.model_dump())
     db.add(db_keranjang)
     db.commit()
     db.refresh(db_keranjang)
@@ -85,7 +110,7 @@ def get_all_keranjang(db: Session):
 def update_keranjang(db: Session, keranjang_id: int, keranjang: schemas.keranjangUpdate):
     db_keranjang = db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).first()
     if db_keranjang:
-        for key, value in keranjang.dict(exclude_unset=True).items():
+        for key, value in keranjang.model_dump(exclude_unset=True).items():
             setattr(db_keranjang, key, value)
         db.commit()
         db.refresh(db_keranjang)
@@ -98,7 +123,7 @@ def delete_keranjang(db: Session, keranjang_id: int):
 #######################################################################################################
 # REVIEW CRUD
 def create_review(db: Session, review: schemas.reviewCreate):
-    db_review = models.Review(**review.dict())
+    db_review = models.Review(**review.model_dump())
     db.add(db_review)
     db.commit()
     db.refresh(db_review)
@@ -113,7 +138,7 @@ def get_all_review(db: Session):
 def update_review(db: Session, review_id: int, review: schemas.reviewUpdate):
     db_review = db.query(models.Review).filter(models.Review.id == review_id).first()
     if db_review:
-        for key, value in review.dict(exclude_unset=True).items():
+        for key, value in review.model_dump(exclude_unset=True).items():
             setattr(db_review, key, value)
         db.commit()
         db.refresh(db_review)
@@ -126,7 +151,7 @@ def delete_review(db: Session, review_id: int):
 #######################################################################################################
 # PESANAN CRUD
 def create_pesanan(db: Session, pesanan: schemas.pesananCreate):
-    db_pesanan = models.Pesanan(**pesanan.dict())
+    db_pesanan = models.Pesanan(**pesanan.model_dump())
     db.add(db_pesanan)
     db.commit()
     db.refresh(db_pesanan)
@@ -141,7 +166,7 @@ def get_all_pesanan(db: Session):
 def update_pesanan(db: Session, pesanan_id: int, pesanan: schemas.pesananUpdate):
     db_pesanan = db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).first()
     if db_pesanan:
-        for key, value in pesanan.dict(exclude_unset=True).items():
+        for key, value in pesanan.model_dump(exclude_unset=True).items():
             setattr(db_pesanan, key, value)
         db.commit()
         db.refresh(db_pesanan)
@@ -154,7 +179,7 @@ def delete_pesanan(db: Session, pesanan_id: int):
 #######################################################################################################
 # KATEGORI CRUD
 def create_kategori(db: Session, kategori: schemas.kategoriCreate):
-    db_kategori = models.Kategori(**kategori.dict())
+    db_kategori = models.Kategori(**kategori.model_dump())
     db.add(db_kategori)
     db.commit()
     db.refresh(db_kategori)
@@ -169,7 +194,7 @@ def get_all_kategori(db: Session):
 def update_kategori(db: Session, kategori_id: int, kategori: schemas.kategoriUpdate):
     db_kategori = db.query(models.Kategori).filter(models.Kategori.id == kategori_id).first()
     if db_kategori:
-        for key, value in kategori.dict(exclude_unset=True).items():
+        for key, value in kategori.model_dump(exclude_unset=True).items():
             setattr(db_kategori, key, value)
         db.commit()
         db.refresh(db_kategori)
@@ -182,7 +207,7 @@ def delete_kategori(db: Session, kategori_id: int):
 #######################################################################################################
 # METODE CRUD
 def create_metode(db: Session, metode: schemas.metodeCreate):
-    db_metode = models.Metode(**metode.dict())
+    db_metode = models.Metode(**metode.model_dump())
     db.add(db_metode)
     db.commit()
     db.refresh(db_metode)
@@ -197,7 +222,7 @@ def get_all_metode(db: Session):
 def update_metode(db: Session, metode_id: int, metode: schemas.metodeUpdate):
     db_metode = db.query(models.Metode).filter(models.Metode.id == metode_id).first()
     if db_metode:
-        for key, value in metode.dict(exclude_unset=True).items():
+        for key, value in metode.model_dump(exclude_unset=True).items():
             setattr(db_metode, key, value)
         db.commit()
         db.refresh(db_metode)

@@ -12,15 +12,25 @@ class User(BaseDB):
     username = Column(String, unique = True, index = True)
     hashed_password = Column(String)
 
+class Profile(BaseDB):
+    __tablename__ = "profiles"
+    id = Column(Integer, primary_key=True)
+    user=Column(Integer, ForeignKey('users.id'), nullable=False)
+    role = Column(String, index = True)
+    nama = Column(String, index = True)
+    alamat = Column(String, index = True)
+    no_telp = Column(String, index = True)
+
 # punya uts ebis
 class Produk(BaseDB):
     __tablename__ = "produk"
     id = Column(Integer, primary_key=True)
     kategori = Column(Integer, ForeignKey('kategori.id'), nullable=False)
-    nama = Column(String, unique=True, index=True)
+    nama = Column(String, index=True, nullable=False)
     deskripsi = Column(String, nullable=False)
     stok = Column(Integer, nullable=False)
     harga = Column(Integer, nullable=False)
+    gambar = Column(String, nullable=False)
 
 class Keranjang(BaseDB):
     __tablename__ = "keranjang"
@@ -42,6 +52,7 @@ class Pesanan(BaseDB):
     id = Column(Integer, primary_key=True)
     user = Column(Integer, ForeignKey('users.id'), nullable=False)
     Produk = Column(Integer, ForeignKey('produk.id'), nullable=False)
+    qty = Column(Integer, nullable=False)
     metode_bayar = Column(Integer, ForeignKey('metode.id'), nullable=False)
     tanggal = Column(Date)
     waktu = Column(Time)

@@ -157,6 +157,32 @@ async def token(req: Request, form_data: OAuth2PasswordRequestForm = Depends(),d
 
 UPLOAD_DIRECTORY = "./../img"
 
+# -------------------- PROFILE CRUD Endpoints --------------------
+
+# create profile
+@app.post("/profile/", response_model=schemas.Profile)
+def create_profile(profile: schemas.ProfileCreate, db: Session = Depends(get_db)):
+    return crud.create_profile(db=db, profile=profile)
+
+# read profile
+@app.get("/profile/{user_id}", response_model=schemas.Profile)
+def read_profile(user_id: int, db: Session = Depends(get_db)):
+    db_profile = crud.get_profile(db, user=user_id)
+    if db_profile is None:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return db_profile
+
+# update profile
+@app.put("/profile/{profile_id}", response_model=schemas.Profile)
+def update_profile(profile_id: int, profile: schemas.ProfileUpdate, db: Session = Depends(get_db)):
+    return crud.update_profile(db=db, profile_id=profile_id, profile=profile)
+
+# delete profile
+@app.delete("/profile/{profile_id}")
+def delete_profile(profile_id: int, db: Session = Depends(get_db)):
+    crud.delete_profile(db, profile_id=profile_id)
+    return {"message": "Profile deleted"}
+
 # -------------------- PRODUK CRUD Endpoints --------------------
 
 # create produk
