@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product List</title>
+</head>
+<body>
+  <h1>Product List</h1>
+  <div id="product-list"></div>
+
+  <script>
+    fetch('http://localhost:8000/produk/')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const productList = document.getElementById('product-list');
+        data.forEach(item => {
+          const productItem = document.createElement('div');
+          productItem.innerHTML = `
+            <h2>${item.nama}</h2>
+            <p>Description: ${item.deskripsi}</p>
+            <p>Stock: ${item.stok}</p>
+            <p>Price: ${item.harga}</p>
+            <img src="${item.gambar}" alt="${item.nama}" width="300">
+            <p>Category ID: ${item.kategori}</p>
+            <hr>
+          `;
+          productList.appendChild(productItem);
+        });
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
+  </script>
+</body>
+</html>
