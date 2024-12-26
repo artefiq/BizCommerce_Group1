@@ -1,10 +1,9 @@
 from pydantic import BaseModel, field_validator
-from typing import Optional
-from datetime import date, time, datetime
-from typing import Optional
+from typing import Optional, List
+from datetime import date, time
 
 ###############################
-# user and token
+# User and Token
 
 class UserBase(BaseModel):
     username: str
@@ -14,6 +13,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+
     class Config:
         from_attributes = True
 
@@ -22,22 +22,19 @@ class Token(BaseModel):
     token_type: str
 
 ###############################
-# profile 
+# Profile
 
 class ProfileBase(BaseModel):
-    user:int
-    role:str
-    nama:str
-    alamat:str
-    no_telp:str
+    user_id: int
+    role: str
+    nama: str
+    alamat: str
+    no_telp: str
 
 class ProfileCreate(ProfileBase):
     pass
 
 class ProfileUpdate(ProfileBase):
-    pass
-
-class ProfileDelete(ProfileBase):
     pass
 
 class Profile(ProfileBase):
@@ -47,22 +44,20 @@ class Profile(ProfileBase):
         from_attributes = True
 
 ###############################
-# produk
+# Produk
+
 class ProdukBase(BaseModel):
-    kategori:int
-    nama:str
-    deskripsi:str
-    stok:int
-    harga:int
-    gambar:str
-    
+    kategori_id: int
+    nama: str
+    deskripsi: str
+    stok: int
+    harga: int
+    gambar: str
+
 class ProdukCreate(ProdukBase):
     pass
 
 class ProdukUpdate(ProdukBase):
-    pass
-
-class ProdukDelete(ProdukBase):
     pass
 
 class Produk(ProdukBase):
@@ -72,131 +67,100 @@ class Produk(ProdukBase):
         from_attributes = True
 
 ###############################
-# keranjang
-class keranjangBase(BaseModel):
-    user:int
-    produk:int
-    qty:int
+# Keranjang
 
-class keranjangCreate(keranjangBase):
+class KeranjangBase(BaseModel):
+    user_id: int
+    produk_id: int
+    qty: int
+
+class KeranjangCreate(KeranjangBase):
     pass
 
-class keranjangUpdate(keranjangBase):
+class KeranjangUpdate(KeranjangBase):
     pass
 
-class keranjangDelete(keranjangBase):
-    pass
-
-class keranjang(keranjangBase):
+class Keranjang(KeranjangBase):
     id: int
 
     class Config:
         from_attributes = True
 
 ###############################
-# review
-class reviewBase(BaseModel):
-    pesanan:int
-    produk:int
-    rating:int
-    review:str
+# Review
 
-class reviewCreate(reviewBase):
+class ReviewBase(BaseModel):
+    pesanan_id: int
+    produk_id: int
+    rating: int
+    review: str
+
+class ReviewCreate(ReviewBase):
     pass
 
-class reviewUpdate(reviewBase):
+class ReviewUpdate(ReviewBase):
     pass
 
-class reviewDelete(reviewBase):
-    pass
-
-class review(reviewBase):
+class Review(ReviewBase):
     id: int
 
     class Config:
         from_attributes = True
 
 ###############################
-# pesanan
-class pesananBase(BaseModel):
-    user:int
-    produk:int
-    qty:int
-    metode_bayar:int
-    tanggal:str
-    waktu:str
-    status_pesanan:str
+# Pesanan
 
-class pesananCreate(pesananBase):
-    pass
+class PesananBase(BaseModel):
+    user_id: int
+    metode_bayar_id: int
+    tanggal: date
+    waktu: time
+    status_pesanan: str
 
-class pesananUpdate(pesananBase):
-    pass
+class PesananCreate(PesananBase):
+    detail: List[dict]
 
-class pesananDelete(pesananBase):
-    pass
+class PesananUpdate(PesananBase):
+    status_pesanan: Optional[str]
 
-class pesanan(pesananBase):
+class Pesanan(PesananBase):
     id: int
+    detail_pesanan: List[dict]
 
     class Config:
         from_attributes = True
 
-    @field_validator("tanggal")
-    def parse_tanggal(cls, value):
-        if isinstance(value, str):
-            return date.fromisoformat(value)
-        return value
-
-    @field_validator("waktu")
-    def parse_waktu(cls, value):
-        if isinstance(value, str):
-            return time.fromisoformat(value)
-        return value
-
-    @property
-    def formatted_tanggal(self):
-        return self.tanggal.strftime("%d %m %Y")
-    
-    @property
-    def formatted_waktu(self):
-        return self.waktu.strftime("%H:%M:%S")
-
 ###############################
-# kategori
-class kategoriBase(BaseModel):
-    kategori:str
+# Kategori
 
-class kategoriCreate(kategoriBase):
+class KategoriBase(BaseModel):
+    nama_kategori: str
+
+class KategoriCreate(KategoriBase):
     pass
 
-class kategoriUpdate(kategoriBase):
+class KategoriUpdate(KategoriBase):
     pass
 
-class kategoriDelete(kategoriBase):
-    pass
-
-class kategori(kategoriBase):
+class Kategori(KategoriBase):
     id: int
 
     class Config:
         from_attributes = True
 
 ###############################
-# metode
-class metodeBase(BaseModel):
-    metode_bayar:str
+# Metode
 
-class metodeCreate(metodeBase):
+class MetodeBase(BaseModel):
+    nama_metode: str
+
+class MetodeCreate(MetodeBase):
     pass
 
-class metodeUpdate(metodeBase):
+class MetodeUpdate(MetodeBase):
     pass
 
-class metodeDelete(metodeBase):
-    pass
-
-class metode(metodeBase):
+class Metode(MetodeBase):
     id: int
 
     class Config:

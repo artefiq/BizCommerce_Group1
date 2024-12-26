@@ -1,38 +1,18 @@
-# package: fastapi, bcrypt, sqlalchemy, python-jose
-
-# test lokal uvicorn main:app --host 0.0.0.0 --port 8000 --reload --
-
-# kalau deploy di server: pip install gunicorn
-# gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --daemon
-# mematikan gunicorn (saat mau update):
-# ps ax|grep gunicorn 
-# pkill gunicorn
-
-from os import path
-from fastapi import Depends, Request, FastAPI, HTTPException
-
-from fastapi.responses import FileResponse, JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm,OAuth2PasswordBearer
-from pydantic import BaseModel
-
+from fastapi import FastAPI, HTTPException, Depends, Request, UploadFile, File
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-
-import crud, models, schemas, shutil, datetime
+from typing import List
+import crud, models, schemas, datetime
 from database import SessionLocal, engine
-models.BaseDB.metadata.create_all(bind=engine)
-from pathlib import Path
-
 from jose import jwt
 
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, File, UploadFile
+models.BaseDB.metadata.create_all(bind=engine)
 
-from typing import List
-
-
-app = FastAPI(title="Web service uts e business",
-    description="Web service uts kelompok 1 2024",
-    version="0.0.1",)
+app = FastAPI(title="Web Service UTS E-Business",
+    description="Web service UTS Kelompok 1 2024",
+    version="0.0.1")
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+SECRET_KEY = "ilkom_upi_top"
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -50,134 +33,82 @@ def get_db():
     finally:
         db.close()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 @app.get("/")
 async def root():
     return {"message": "Dokumentasi API: [url]:8000/docs"}
 
-######################### USERS
+######################### USERS #########################
 
-# create user 
 @app.post("/users/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_username(db, username=user.username)
-    if db_user:
+    if crud.get_user_by_username(db, username=user.username):
         raise HTTPException(status_code=400, detail="Error: Username sudah digunakan")
     return crud.create_user(db=db, user=user)
 
-# hasil adalah akses token    
-@app.post("/login") #,response_model=schemas.Token
+@app.post("/login")
 async def login(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    if not authenticate(db,user):
+    if not authenticate(db, user):
         raise HTTPException(status_code=400, detail="Username atau password tidak cocok")
-
-    # ambil informasi username
-    user_login = crud.get_user_by_username(db,user.username)
+    
+    user_login = crud.get_user_by_username(db, user.username)
     if user_login:
         access_token = create_access_token(user.username)
-        user_id = user_login.id
-        return {"user_id":user_id,"access_token": access_token}
+        return {"user_id": user_login.id, "access_token": access_token}
     else:
         raise HTTPException(status_code=400, detail="User tidak ditemukan, kontak admin")
 
-#lihat detil user_id
 @app.get("/users/{user_id}", response_model=schemas.User)
-def read_user(user_id: int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
-    usr =  verify_token(token) 
+def read_user(user_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    verify_token(token)
     db_user = crud.get_user(db, user_id=user_id)
-    if db_user is None:
+    if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-######################## AUTH
+######################### AUTH #########################
 
-# periksa apakah username ada dan passwordnya cocok
-# return boolean TRUE jika username dan password cocok
-def authenticate(db,user: schemas.UserCreate):
-    user_cari = crud.get_user_by_username(db=db, username=user.username)
-    if user_cari:
-        return (user_cari.hashed_password == crud.hashPassword(user.password))
-    else:
-        return False    
-    
-SECRET_KEY = "ilkom_upi_top"
+def authenticate(db, user: schemas.UserCreate):
+    user_db = crud.get_user_by_username(db=db, username=user.username)
+    return user_db and crud.verify_password(user.password, user_db.hashed_password)
 
 def create_access_token(username):
-    # membuat token dengan waktu expire
     expiration_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=24)
-    access_token = jwt.encode({"username": username, "exp": expiration_time}, SECRET_KEY, algorithm="HS256")
-    return access_token
+    return jwt.encode({"username": username, "exp": expiration_time}, SECRET_KEY, algorithm="HS256")
 
 def verify_token(token: str):
     try:
-        payload = jwt.decode(token,SECRET_KEY,algorithms=["HS256"])  # bukan algorithm,  algorithms (set)
-        username = payload["username"]  
-
-    # exception jika token invalid
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload["username"]
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Unauthorize token, expired signature, harap login")
-    except jwt.JWSError:
-        raise HTTPException(status_code=401, detail="Unauthorize token, JWS Error")
-    except jwt.JWTClaimsError:
-        raise HTTPException(status_code=401, detail="Unauthorize token, JWT Claim Error")
+        raise HTTPException(status_code=401, detail="Token expired, harap login ulang")
     except jwt.JWTError:
-        raise HTTPException(status_code=401, detail="Unauthorize token, JWT Error")   
-    except Exception as e:
-        raise HTTPException(status_code=401, detail="Unauthorize token, unknown error"+str(e))
-    
-    return {"user_name": username}
-
-# internal untuk testing, jangan dipanggil langsung
-# untuk swagger  .../doc supaya bisa auth dengan tombol gembok di kanan atas
-# kalau penggunaan standard, gunakan /login
+        raise HTTPException(status_code=401, detail="Token tidak valid")
 
 @app.post("/token", response_model=schemas.Token)
-async def token(req: Request, form_data: OAuth2PasswordRequestForm = Depends(),db: Session = Depends(get_db)):
+async def token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user_data = schemas.UserCreate(username=form_data.username, password=form_data.password)
+    if not authenticate(db, user_data):
+        raise HTTPException(status_code=400, detail="Username atau password tidak cocok")
+    return {"access_token": create_access_token(form_data.username), "token_type": "bearer"}
 
-    f = schemas.UserCreate
-    f.username = form_data.username
-    f.password = form_data.password
-    if not authenticate(db,f):
-        raise HTTPException(status_code=400, detail="username or password tidak cocok")
+######################### CRUD Operations #########################
 
-    #info = crud.get_user_by_username(form_data.username)
-    # email = info["email"]   
-    # role  = info["role"]   
-    username  = form_data.username
-
-    #buat access token\
-    # def create_access_token(user_name,email,role,nama,status,kode_dosen,unit):
-    access_token  = create_access_token(username)
-
-    return {"access_token": access_token, "token_type": "bearer"}
-
-####################################################################################################
-# punya e bis
-
-UPLOAD_DIRECTORY = "./../img"
-
-# -------------------- PROFILE CRUD Endpoints --------------------
-
-# create profile
+# Profile Endpoints
 @app.post("/profile/", response_model=schemas.Profile)
 def create_profile(profile: schemas.ProfileCreate, db: Session = Depends(get_db)):
     return crud.create_profile(db=db, profile=profile)
 
-# read profile
 @app.get("/profile/{user_id}", response_model=schemas.Profile)
 def read_profile(user_id: int, db: Session = Depends(get_db)):
     db_profile = crud.get_profile(db, user_id=user_id)
-    if db_profile is None:
+    if not db_profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     return db_profile
 
-# update profile
 @app.put("/profile/{profile_id}", response_model=schemas.Profile)
 def update_profile(profile_id: int, profile: schemas.ProfileUpdate, db: Session = Depends(get_db)):
     return crud.update_profile(db=db, profile_id=profile_id, profile=profile)
 
-# delete profile
 @app.delete("/profile/{profile_id}")
 def delete_profile(profile_id: int, db: Session = Depends(get_db)):
     crud.delete_profile(db, profile_id=profile_id)
@@ -185,12 +116,10 @@ def delete_profile(profile_id: int, db: Session = Depends(get_db)):
 
 # -------------------- PRODUK CRUD Endpoints --------------------
 
-# create produk
 @app.post("/produk/", response_model=schemas.Produk)
 def create_produk(produk: schemas.ProdukCreate, db: Session = Depends(get_db)):
     return crud.create_produk(db=db, produk=produk)
 
-# read produk
 @app.get("/produk/{produk_id}", response_model=schemas.Produk)
 def read_produk(produk_id: int, db: Session = Depends(get_db)):
     db_produk = crud.get_produk(db, produk_id=produk_id)
@@ -198,17 +127,14 @@ def read_produk(produk_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Produk not found")
     return db_produk
 
-# read all produk
 @app.get("/produk/", response_model=List[schemas.Produk])
 def read_all_produk(db: Session = Depends(get_db)):
     return crud.get_all_produk(db)
 
-# update produk
 @app.put("/produk/{produk_id}", response_model=schemas.Produk)
 def update_produk(produk_id: int, produk: schemas.ProdukUpdate, db: Session = Depends(get_db)):
     return crud.update_produk(db=db, produk_id=produk_id, produk=produk)
 
-# delete produk
 @app.delete("/produk/{produk_id}")
 def delete_produk(produk_id: int, db: Session = Depends(get_db)):
     crud.delete_produk(db, produk_id=produk_id)
@@ -216,23 +142,23 @@ def delete_produk(produk_id: int, db: Session = Depends(get_db)):
 
 # -------------------- KERANJANG CRUD Endpoints --------------------
 
-@app.post("/keranjang/", response_model=schemas.keranjang)
-def create_keranjang(keranjang: schemas.keranjangCreate, db: Session = Depends(get_db)):
+@app.post("/keranjang/", response_model=schemas.Keranjang)
+def create_keranjang(keranjang: schemas.KeranjangCreate, db: Session = Depends(get_db)):
     return crud.create_keranjang(db=db, keranjang=keranjang)
 
-@app.get("/keranjang/{keranjang_id}", response_model=schemas.keranjang)
+@app.get("/keranjang/{keranjang_id}", response_model=schemas.Keranjang)
 def read_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
     db_keranjang = crud.get_keranjang(db, keranjang_id=keranjang_id)
     if db_keranjang is None:
         raise HTTPException(status_code=404, detail="Keranjang not found")
     return db_keranjang
 
-@app.get("/keranjang/", response_model=List[schemas.keranjang])
+@app.get("/keranjang/", response_model=List[schemas.Keranjang])
 def read_all_keranjang(db: Session = Depends(get_db)):
     return crud.get_all_keranjang(db)
 
-@app.put("/keranjang/{keranjang_id}", response_model=schemas.keranjang)
-def update_keranjang(keranjang_id: int, keranjang: schemas.keranjangUpdate, db: Session = Depends(get_db)):
+@app.put("/keranjang/{keranjang_id}", response_model=schemas.Keranjang)
+def update_keranjang(keranjang_id: int, keranjang: schemas.KeranjangUpdate, db: Session = Depends(get_db)):
     return crud.update_keranjang(db=db, keranjang_id=keranjang_id, keranjang=keranjang)
 
 @app.delete("/keranjang/{keranjang_id}")
@@ -242,23 +168,23 @@ def delete_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
 
 # -------------------- REVIEW CRUD Endpoints --------------------
 
-@app.post("/review/", response_model=schemas.review)
-def create_review(review: schemas.reviewCreate, db: Session = Depends(get_db)):
+@app.post("/review/", response_model=schemas.Review)
+def create_review(review: schemas.ReviewCreate, db: Session = Depends(get_db)):
     return crud.create_review(db=db, review=review)
 
-@app.get("/review/{review_id}", response_model=schemas.review)
+@app.get("/review/{review_id}", response_model=schemas.Review)
 def read_review(review_id: int, db: Session = Depends(get_db)):
     db_review = crud.get_review(db, review_id=review_id)
     if db_review is None:
         raise HTTPException(status_code=404, detail="Review not found")
     return db_review
 
-@app.get("/review/", response_model=List[schemas.review])
+@app.get("/review/", response_model=List[schemas.Review])
 def read_all_review(db: Session = Depends(get_db)):
     return crud.get_all_review(db)
 
-@app.put("/review/{review_id}", response_model=schemas.review)
-def update_review(review_id: int, review: schemas.reviewUpdate, db: Session = Depends(get_db)):
+@app.put("/review/{review_id}", response_model=schemas.Review)
+def update_review(review_id: int, review: schemas.ReviewUpdate, db: Session = Depends(get_db)):
     return crud.update_review(db=db, review_id=review_id, review=review)
 
 @app.delete("/review/{review_id}")
@@ -268,23 +194,23 @@ def delete_review(review_id: int, db: Session = Depends(get_db)):
 
 # -------------------- PESANAN CRUD Endpoints --------------------
 
-@app.post("/pesanan/", response_model=schemas.pesanan)
-def create_pesanan(pesanan: schemas.pesananCreate, db: Session = Depends(get_db)):
+@app.post("/pesanan/", response_model=schemas.Pesanan)
+def create_pesanan(pesanan: schemas.PesananCreate, db: Session = Depends(get_db)):
     return crud.create_pesanan(db=db, pesanan=pesanan)
 
-@app.get("/pesanan/{pesanan_id}", response_model=schemas.pesanan)
+@app.get("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
 def read_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
     db_pesanan = crud.get_pesanan(db, pesanan_id=pesanan_id)
     if db_pesanan is None:
         raise HTTPException(status_code=404, detail="Pesanan not found")
     return db_pesanan
 
-@app.get("/pesanan/", response_model=List[schemas.pesanan])
+@app.get("/pesanan/", response_model=List[schemas.Pesanan])
 def read_all_pesanan(db: Session = Depends(get_db)):
     return crud.get_all_pesanan(db)
 
-@app.put("/pesanan/{pesanan_id}", response_model=schemas.pesanan)
-def update_pesanan(pesanan_id: int, pesanan: schemas.pesananUpdate, db: Session = Depends(get_db)):
+@app.put("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
+def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session = Depends(get_db)):
     return crud.update_pesanan(db=db, pesanan_id=pesanan_id, pesanan=pesanan)
 
 @app.delete("/pesanan/{pesanan_id}")
@@ -294,23 +220,23 @@ def delete_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
 
 # -------------------- KATEGORI CRUD Endpoints --------------------
 
-@app.post("/kategori/", response_model=schemas.kategori)
-def create_kategori(kategori: schemas.kategoriCreate, db: Session = Depends(get_db)):
+@app.post("/kategori/", response_model=schemas.Kategori)
+def create_kategori(kategori: schemas.KategoriCreate, db: Session = Depends(get_db)):
     return crud.create_kategori(db=db, kategori=kategori)
 
-@app.get("/kategori/{kategori_id}", response_model=schemas.kategori)
+@app.get("/kategori/{kategori_id}", response_model=schemas.Kategori)
 def read_kategori(kategori_id: int, db: Session = Depends(get_db)):
     db_kategori = crud.get_kategori(db, kategori_id=kategori_id)
     if db_kategori is None:
         raise HTTPException(status_code=404, detail="Kategori not found")
     return db_kategori
 
-@app.get("/kategori/", response_model=List[schemas.kategori])
+@app.get("/kategori/", response_model=List[schemas.Kategori])
 def read_all_kategori(db: Session = Depends(get_db)):
     return crud.get_all_kategori(db)
 
-@app.put("/kategori/{kategori_id}", response_model=schemas.kategori)
-def update_kategori(kategori_id: int, kategori: schemas.kategoriUpdate, db: Session = Depends(get_db)):
+@app.put("/kategori/{kategori_id}", response_model=schemas.Kategori)
+def update_kategori(kategori_id: int, kategori: schemas.KategoriUpdate, db: Session = Depends(get_db)):
     return crud.update_kategori(db=db, kategori_id=kategori_id, kategori=kategori)
 
 @app.delete("/kategori/{kategori_id}")
@@ -320,27 +246,26 @@ def delete_kategori(kategori_id: int, db: Session = Depends(get_db)):
 
 # -------------------- METODE CRUD Endpoints --------------------
 
-@app.post("/metode/", response_model=schemas.metode)
-def create_metode(metode: schemas.metodeCreate, db: Session = Depends(get_db)):
+@app.post("/metode/", response_model=schemas.Metode)
+def create_metode(metode: schemas.MetodeCreate, db: Session = Depends(get_db)):
     return crud.create_metode(db=db, metode=metode)
 
-@app.get("/metode/{metode_id}", response_model=schemas.metode)
+@app.get("/metode/{metode_id}", response_model=schemas.Metode)
 def read_metode(metode_id: int, db: Session = Depends(get_db)):
     db_metode = crud.get_metode(db, metode_id=metode_id)
     if db_metode is None:
         raise HTTPException(status_code=404, detail="Metode not found")
     return db_metode
 
-@app.get("/metode/", response_model=List[schemas.metode])
+@app.get("/metode/", response_model=List[schemas.Metode])
 def read_all_metode(db: Session = Depends(get_db)):
     return crud.get_all_metode(db)
 
-@app.put("/metode/{metode_id}", response_model=schemas.metode)
-def update_metode(metode_id: int, metode: schemas.metodeUpdate, db: Session = Depends(get_db)):
+@app.put("/metode/{metode_id}", response_model=schemas.Metode)
+def update_metode(metode_id: int, metode: schemas.MetodeUpdate, db: Session = Depends(get_db)):
     return crud.update_metode(db=db, metode_id=metode_id, metode=metode)
 
 @app.delete("/metode/{metode_id}")
 def delete_metode(metode_id: int, db: Session = Depends(get_db)):
     crud.delete_metode(db, metode_id=metode_id)
     return {"message": "Metode deleted"}
-
