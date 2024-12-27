@@ -183,6 +183,66 @@
 
   }); // End of a document
 
+  // Fetch Produk List
+function fetchProductList() {
+  fetch('http://localhost:8000/produk/', {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = ''; // Bersihkan konten sebelumnya
+
+    data.forEach(item => {
+      const productItem = document.createElement('div');
+      productItem.classList.add('swiper-slide');
+      productItem.innerHTML = `
+        <div class="card position-relative">
+          <a href="single-product.html?id=${item.id}"><img src="${item.gambar}" class="img-fluid rounded-4" alt="${item.nama}"></a>
+          <div class="card-body p-0">
+            <a href="single-product.html?id=${item.id}">
+              <h3 class="card-title pt-4 m-0">${item.nama}</h3>
+            </a>
+            <div class="card-text">
+              <span class="rating secondary-font">
+                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
+                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
+                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
+                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
+                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
+                5.0
+              </span>
+              <h3 class="secondary-font text-primary">$${item.harga}</h3>
+              <div class="d-flex flex-wrap mt-3">
+                <a href="#" class="btn-cart me-3 px-4 pt-3 pb-3">
+                  <h5 class="text-uppercase m-0">Add to Cart</h5>
+                </a>
+                <a href="#" class="btn-wishlist px-4 pt-3">
+                  <iconify-icon icon="fluent:heart-28-filled" class="fs-5"></iconify-icon>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      productList.appendChild(productItem);
+    });
+  })
+  .catch(error => {
+    console.error('There has been a problem with fetching the product list:', error);
+  });
+}
+
+// Panggil fungsi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', fetchProductList);
+
 })(jQuery);
 
 // Quantity controls for cart items
