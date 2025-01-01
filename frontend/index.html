@@ -335,7 +335,7 @@
                   </a>
                 </li>
                 <li>
-                  <a href="index.html" class="mx-3">
+                  <a href="logout.html" class="mx-3">
                     <iconify-icon icon="mdi:heart" class="fs-4"></iconify-icon>
                   </a>
                 </li>
@@ -1672,6 +1672,23 @@
   <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
   <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  
+  <script>
+    // Ambil data dari localStorage
+    const userData = localStorage.getItem("userData");
+
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      console.log("User Data:", parsedData);
+
+      // Contoh: Gunakan data
+      console.log("User ID:", parsedData.user_id);
+      console.log("Access Token:", parsedData.access_token);
+    } else {
+      console.warn("No user data found. Redirecting to login page.");
+      window.location.href = "login.html"; // Redirect jika belum login
+    }
+  </script>
 </body>
 
 </html>
