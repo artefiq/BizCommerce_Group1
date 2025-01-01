@@ -338,13 +338,13 @@
           <!-- Left Container: Product Image -->
           <div class="product-image pe-3">
             <a href="">
-              <img src="images/item1.jpg" class="img-fluid rounded-4" alt="Grey hoodie">
+              <img :src="gambar" class="img-fluid rounded-4" :alt="nama">
             </a>
           </div>
 
           <!-- Right Container: Product Description -->
           <div class="product-details flex-grow-1">
-            <h3 class="product-title pt-4 m-0">Grey hoodie</h3>
+            <h3 class="product-title pt-4 m-0">{{ nama }}</h3>
 
             <div class="card-text my-3">
               <span class="rating secondary-font">
@@ -355,7 +355,7 @@
                 <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                 5.0
               </span>
-              <h3 class="secondary-font text-primary mt-2">$18.00</h3>
+              <h3 class="secondary-font text-primary mt-2">Rp{{ harga }}</h3>
             </div>
 
             <!-- Quantity Control -->
@@ -376,7 +376,7 @@
     </div>
 
     <div class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);">
-      <p class="me-3 px-3 pt-3 pb-3"><b>Detail Produk:</b><br>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+      <p class="me-3 px-3 pt-3 pb-3"><b>Detail Produk:</b><br>{{ deskripsi }}</p>
     </div>
   </section>
 
@@ -387,7 +387,7 @@
           <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
         </div>
         <a href="#">
-          <img src="images/insta1.jpg" alt="insta-img" class="img-fluid rounded-3">
+          <img :src="images/insta1.jpg" alt="insta-img" class="img-fluid rounded-3">
         </a>
       </div>
       <div class="col instagram-item  text-center position-relative">
@@ -551,7 +551,63 @@
   </div>
 
   <!-- Vue.js Instance -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          quantity: 1, // Initial quantity
+          nama: "", // Product name
+          harga: "", // Product price
+          deskripsi: "", // Product description
+          gambar: "", // Product image URL
+        };
+      },
+      methods: {
+        increaseQuantity() {
+          this.quantity++;
+        },
+        decreaseQuantity() {
+          if (this.quantity > 1) {
+            this.quantity--;
+          }
+        },
+        // Function to fetch product data by ID
+        async fetchProductById(id) {
+          try{
+            const response = await axios.get(`http://localhost:8000/produk/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+              }
+            });
+            const responseData = response.data;
+            this.nama = responseData.nama;
+            this.harga = responseData.harga;
+            this.deskripsi = responseData.deskripsi;
+            this.gambar = responseData.gambar;
+            console.log(this.nama);
+          }
+          catch(error) {
+            console.error(error.message);
+          }
+        }
+      },
+      async mounted() {
+        // Get product ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        
+        if (productId) {
+          await this.fetchProductById(productId); // Fetch product data by ID
+        } else {
+          console.error('Product ID not found in the URL');
+        }
+      }
+    }).mount('#product-section');
+  </script>
+  <!-- <script>
     const { createApp } = Vue;
 
     createApp({
@@ -571,7 +627,69 @@
         }
       }
     }).mount('#product-section'); // Mount to the section with the id 'product-section'
-  </script>
+    
+    // Handle login form submission
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      fetch('http://localhost:8000/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Login successful');
+        localStorage.setItem('access_token', data.access_token);
+        fetchProductList(); // Fetch the product list after login
+      })
+      .catch(error => {
+        console.error('Error during login:', error);
+      });
+    });
+
+    // Function to fetch product list with authorization
+    function fetchProductById(id) {
+      fetch(`http://localhost:8000/produk/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const productList = document.getElementById('product-list');
+        productList.innerHTML = ''; // Clear any existing content
+        data.forEach(item => {
+          const productItem = document.createElement('div');
+          productItem.innerHTML = `
+            <h2>${item.nama}</h2>
+            <p>Description: ${item.deskripsi}</p>
+            <p>Stock: ${item.stok}</p>
+            <p>Price: ${item.harga}</p>
+            <img src="${item.gambar}" alt="${item.nama}" width="300">
+            <p>Category ID: ${item.kategori}</p>
+            <hr>
+          `;
+          productList.appendChild(productItem);
+        });
+      })
+      .catch(error => {
+        console.error('There has been a problem with fetching the product list:', error);
+      });
+    }
+  </script> -->
 
   <script src="js/jquery-1.11.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
