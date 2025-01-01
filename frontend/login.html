@@ -24,17 +24,20 @@
       <h2 class="text-center secondary-font text-primary mb-4">Login</h2>
 
       <!-- Form Login -->
-      <form id="loginForm" onsubmit="return login(event)">
+      <form id="loginForm" onsubmit="return validateAndLogin(event)">
         <!-- Input Email -->
         <div class="mb-3">
           <label for="email" class="form-label text-muted">Email Address</label>
-          <input type="email" class="form-control form-control-lg" id="email" placeholder="Enter your email" required>
+          <input type="text" class="form-control form-control-lg" id="email" placeholder="Enter your email" required>
         </div>
 
         <!-- Input Password -->
         <div class="mb-3">
           <label for="password" class="form-label text-muted">Password</label>
-          <input type="password" class="form-control form-control-lg" id="password" placeholder="Enter your password" required>
+          <div class="input-group">
+            <input type="password" class="form-control form-control-lg" id="password" placeholder="Enter your password" required>
+            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">Show</button>
+          </div>
         </div>
 
         <!-- Tombol Login -->
@@ -43,7 +46,7 @@
         </div>
 
         <!-- Pesan Error -->
-        <p id="message" class="text-danger text-center mt-3" style="display: none;">Invalid login. Please try again.</p>
+        <div id="message" class="alert alert-danger text-center mt-3" style="display: none;">Invalid login. Please try again.</div>
 
         <!-- Tautan untuk Register -->
         <p class="text-center mt-3">
@@ -55,7 +58,67 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-  <script src="login.js"></script> <!-- Memanggil file login.js -->
+  <script>
+    // Fungsi untuk toggle password visibility
+    function togglePassword() {
+      const passwordField = document.getElementById("password");
+      passwordField.type = passwordField.type === "password" ? "text" : "password";
+    }
+
+    // Fungsi validasi input sebelum login
+    async function validateAndLogin(event) {
+      event.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) {
+        const messageElement = document.getElementById("message");
+        messageElement.style.display = "block";
+        messageElement.textContent = "Please fill out all fields.";
+        return false;
+      }
+
+      // Panggil fungsi login jika validasi berhasil
+      return login(event);
+    }
+
+    // Fungsi untuk login
+    async function login(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username: email,
+            password: password
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          alert("Login successful!");
+          window.location.href = "index.html";
+        } else if (response.status === 422) {
+          const errorData = await response.json();
+          document.getElementById("message").style.display = "block";
+          document.getElementById("message").textContent = "Invalid login. Please try again.";
+        } else {
+          document.getElementById("message").style.display = "block";
+          document.getElementById("message").textContent = "Login failed. Please check your credentials.";
+        }
+      } catch (error) {
+        document.getElementById("message").style.display = "block";
+        document.getElementById("message").textContent = "An error occurred. Please try again.";
+      }
+    }
+  </script>
 </body>
 
 </html>
