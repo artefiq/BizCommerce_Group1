@@ -131,6 +131,13 @@ def read_produk(produk_id: int, db: Session = Depends(get_db)):
 def read_all_produk(db: Session = Depends(get_db)):
     return crud.get_all_produk(db)
 
+@app.get("/produk/{kategori_id}", response_model=List[schemas.Produk])
+def read_produk_kategori_id(kategori_id: int, db: Session = Depends(get_db)):
+    db_produk_kategori_id = crud.get_produk_category_id(db, kategori_id=kategori_id)
+    if db_produk_kategori_id is None:
+        raise HTTPException(status_code=404, detail="Produk not found")
+    return db_produk_kategori_id
+
 @app.put("/produk/{produk_id}", response_model=schemas.Produk)
 def update_produk(produk_id: int, produk: schemas.ProdukUpdate, db: Session = Depends(get_db)):
     return crud.update_produk(db=db, produk_id=produk_id, produk=produk)

@@ -78,6 +78,9 @@ def create_produk(db: Session, produk: schemas.ProdukCreate):
 def get_produk(db: Session, produk_id: int):
     return db.query(models.Produk).filter(models.Produk.id == produk_id).first()
 
+def get_produk_category_id(db: Session, kategori_id: int):
+    return db.query(models.Produk).filter(models.Produk.kategori_id == kategori_id)
+
 def get_all_produk(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Produk).offset(skip).limit(limit).all()
 

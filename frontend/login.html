@@ -116,7 +116,7 @@
           // Redirect ke halaman lain setelah 2 detik
           setTimeout(() => {
             window.location.href = "index.html"; // Ganti dengan halaman tujuan Anda
-          }, 2000);
+          }, 100);
         } else {
           const errorMessage = await response.text(); // Mengambil string error
           console.error("Login failed:", errorMessage);
