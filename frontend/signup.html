@@ -25,12 +25,6 @@
 
       <!-- Form Sign Up -->
       <form id="signupForm" onsubmit="return signup(event)">
-        <!-- Input Nama -->
-        <div class="mb-3">
-          <label for="name" class="form-label text-muted">Full Name</label>
-          <input type="text" class="form-control form-control-lg" id="name" placeholder="Enter your full name" required>
-        </div>
-
         <!-- Input Email -->
         <div class="mb-3">
           <label for="email" class="form-label text-muted">Email Address</label>
@@ -78,7 +72,7 @@
       // Validasi apakah password dan konfirmasi password cocok
       if (password === confirmPassword) {
         try {
-          const response = await fetch("http://127.0.0.1:8000/users", {
+          const response = await fetch("http://127.0.0.1:8000/users/", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -88,6 +82,10 @@
               password: password
             })
           });
+          if (response.ok) {
+            alert("Sign up successful!");
+        window.location.href = "login.html"; // Redirect ke halaman login setelah signup berhasil
+          }
         }
 
         catch (error) {
@@ -97,9 +95,6 @@
           messageElement.textContent = "An error occurred. Please try again.";
           messageElement.style.display = "block";
         }
-
-        alert("Sign up successful!");
-        window.location.href = "login.html"; // Redirect ke halaman login setelah signup berhasil
         
         } else {
           message.style.display = "block"; // Tampilkan pesan error jika password tidak cocok

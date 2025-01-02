@@ -109,6 +109,7 @@
             const result = await response.json();
             responseMessage.className = "alert alert-success";
             responseMessage.textContent = `Profile created successfully! ID: ${result.id}`;
+            window.location.href = "index.html"; // Redirect jika belum login
             } else {
             const errorData = await response.json();
             responseMessage.className = "alert alert-danger";
