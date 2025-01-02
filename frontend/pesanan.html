@@ -322,55 +322,121 @@
 
     </div>
   </header>
-  
-  <section id="product-section" class="my-5 overflow-hidden"> 
-    <div class="container">
-      <div class="row">
-        <div class="col-12 d-flex">
-          <!-- Left Container: Product Image -->
-          <div class="product-image pe-3">
-            <a href="">
-              <img :src="gambar" class="img-fluid rounded-4" :alt="nama">
-            </a>
-          </div>
 
-          <!-- Right Container: Product Description -->
-          <div class="product-details flex-grow-1">
-            <h3 class="product-title pt-4 m-0">{{ nama }}</h3>
-
-            <div class="card-text my-3">
-              <span class="rating secondary-font">
-                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
-                5.0
-              </span>
-              <h5 class="secondary-font text-primary mt-2">{{ harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) }}</h5>
-            </div>
-
-            <!-- Quantity Control -->
-            <div class="d-flex align-items-center mt-3 mb-3">
-              <button @click="decreaseQuantity" class="btn btn-outline-secondary">-</button>
-              <span class="mx-4">{{ quantity }}</span>
-              <button @click="increaseQuantity" class="btn btn-outline-secondary">+</button>
-            </div>
-
-            <div class="d-flex flex-wrap">
-              <a href="#" class="btn-cart me-2 px-2 pt-2 pb-2">
-                <h6 class="m-0" @click="addToCart">Add to Cart</h6>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  <section id="order-section" class="my-5">
     <div class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);">
-      <p class="me-3 px-3 pt-3 pb-3"><b>Detail Produk:</b><br>{{ deskripsi }}</p>
+        <table style="width: 100%; table-layout: fixed;">
+          <!-- Row Pertama: Tanggal dan Order ID -->
+          <tr>
+            <td style="text-align: left; width: 50%; padding: 10px;">
+              <strong>01 Januari 2025, 14:30</strong>
+            </td>
+            <td style="text-align: right; width: 50%; padding: 10px;">
+              <strong>Order ID</strong>
+            </td>
+          </tr>
+        </table>
+        <table style="width: 100%; table-layout: fixed;">
+          <!-- product -->
+          <tr>
+            <td style="width: 15%; padding: 20;">
+              <div style="background-color: #DEAD6F; width: 150px; height: 150px;" class="rounded-4"></div>
+            </td>
+            <td style="width: 70%; padding: 10px;">
+              <table style="width:100%">
+                <tr>
+                  <td style="text-align: left; width: 50%; padding: 10px;"><div><strong>Nama Produk</strong></div></td>
+                  <td style="text-align: right; width: 50%; padding: 10px;"><div>x 3</div></td>
+                </tr>
+                <tr></tr>
+                  <td style="text-align: left; width: 50%; padding: 10px;"><div></div></td>
+                  <td style="text-align: right; width: 50%; padding: 10px;"><div>Rp 100.000</div></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: left; width: 50%; padding: 10px;">
+              <strong>Status :</strong> Belum Dibayar
+            </td>
+            <td style="text-align: right; width: 50%; padding: 10px;">
+              <strong>Total Pesanan :</strong> Rp 300.000
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" class="text-end" style="padding: 10px;">
+              <a href="#" class="btn btn-primary">Bayar</a>
+            </td>
+          </tr>
+        </table>
     </div>
+    <div class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);">
+        <table style="width: 100%; table-layout: fixed;">
+          <!-- Row Pertama: Tanggal dan Order ID -->
+          <tr>
+            <td style="text-align: left; width: 50%; padding: 10px;">
+              <strong>01 Januari 2025, 14:30</strong>
+            </td>
+            <td style="text-align: right; width: 50%; padding: 10px;">
+              <strong>Order ID</strong>
+            </td>
+          </tr>
+        </table>
+        <table style="width: 100%; table-layout: fixed;">
+          <!-- product -->
+          <tr>
+            <td style="width: 15%; padding-bottom: 20px;;">
+              <div style="background-color: #DEAD6F; width: 150px; height: 150px;" class="rounded-4"></div>
+            </td>
+            <td style="width: 70%; padding: 10px;">
+              <table style="width:100%">
+                <tr>
+                  <td style="text-align: left; width: 50%; padding: 10px;"><div><strong>Nama Produk</strong></div></td>
+                  <td style="text-align: right; width: 50%; padding: 10px;"><div>x 3</div></td>
+                </tr>
+                <tr></tr>
+                  <td style="text-align: left; width: 50%; padding: 10px;"><div></div></td>
+                  <td style="text-align: right; width: 50%; padding: 10px;"><div>Rp 100.000</div></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="width: 15%; padding-bottom: 20px;;">
+              <div style="background-color: #DEAD6F; width: 150px; height: 150px;" class="rounded-4"></div>
+            </td>
+            <td style="width: 70%; padding: 10px;">
+              <table style="width:100%">
+                <tr>
+                  <td style="text-align: left; width: 50%; padding: 10px;"><div><strong>Nama Produk</strong></div></td>
+                  <td style="text-align: right; width: 50%; padding: 10px;"><div>x 3</div></td>
+                </tr>
+                <tr></tr>
+                  <td style="text-align: left; width: 50%; padding: 10px;"><div></div></td>
+                  <td style="text-align: right; width: 50%; padding: 10px;"><div>Rp 50.000</div></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: left; width: 50%; padding: 10px;">
+              <strong>Status :</strong> Belum Dibayar
+            </td>
+            <td style="text-align: right; width: 50%; padding: 10px;">
+              <strong>Total Pesanan :</strong> Rp 450.000
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" class="text-end" style="padding: 10px;">
+              <a href="#" class="btn btn-primary">Bayar</a>
+            </td>
+          </tr>
+        </table>
+    </div>
+  
   </section>
+
+  
 
   <section id="insta" class="my-5">
     <div class="row g-0 py-5">
