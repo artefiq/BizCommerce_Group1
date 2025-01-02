@@ -13,6 +13,7 @@ function signup(event) {
       alert("Sign up successful!");
       window.location.href = "login.html"; // Redirect ke halaman login setelah signup berhasil
     } else {
+      alert("Password not match!");
       message.style.display = "block"; // Tampilkan pesan error jika password tidak cocok
     }
   }
