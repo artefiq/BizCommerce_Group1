@@ -355,7 +355,7 @@
                 <iconify-icon icon="clarity:star-solid" class="text-primary"></iconify-icon>
                 5.0
               </span>
-              <h5 class="secondary-font text-primary mt-2">Rp{{ harga }}</h5>
+              <h5 class="secondary-font text-primary mt-2">{{ harga.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) }}</h5>
             </div>
 
             <!-- Quantity Control -->
@@ -554,7 +554,7 @@
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
     const { createApp } = Vue;
-
+  
     createApp({
       data() {
         return {
@@ -563,167 +563,93 @@
           harga: "", // Product price
           deskripsi: "", // Product description
           gambar: "", // Product image URL
+          id: null, // Product ID
+          user_id: null, // User ID
+          access_token: null, // Access Token
         };
       },
       methods: {
+        // Increase quantity
         increaseQuantity() {
           this.quantity++;
         },
+        // Decrease quantity
         decreaseQuantity() {
           if (this.quantity > 1) {
             this.quantity--;
           }
         },
-
-        // Function to fetch product data by ID
+        // Fetch product data by ID
         async fetchProductById(id) {
-          try{
+          try {
             const response = await axios.get(`http://localhost:8000/produk/${id}`, {
               headers: {
-                'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-              }
+                Authorization: `Bearer ${this.access_token}`,
+              },
             });
             const responseData = response.data;
+            this.id = id; // Set product ID
             this.nama = responseData.nama;
             this.harga = responseData.harga;
             this.deskripsi = responseData.deskripsi;
             this.gambar = responseData.gambar;
-            console.log(this.nama);
-          }
-          catch(error) {
-            console.error(error.message);
+          } catch (error) {
+            console.error("Error fetching product data:", error.message);
           }
         },
-
-        // Function add product to cart
+        // Add product to cart
         async addToCart() {
-          /*const userId = localStorage.getItem('user_id'); // Ambil user_id dari localStorage (atau sumber lain)
-          if (!userId) {
-            alert("Please login first!");
-            return;
-          }*/
-          if (!this.id || !this.quantity) {
-            alert("Invalid product or quantity.");
+          if (!this.id || !this.quantity || !this.user_id || !this.access_token) {
+            alert("Invalid product or user data.");
             return;
           }
-
+  
           const payload = {
-            //user_id: parseInt(localStorage.getItem("user_id")), // Assume user ID is stored in localStorage
+            user_id: this.user_id,
             produk_id: this.id,
             qty: this.quantity,
           };
-
+  
           try {
             const response = await axios.post("http://localhost:8000/keranjang/", payload, {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${this.access_token}`,
               },
             });
             alert("Product added to cart successfully!");
-            console.log(response.data);
           } catch (error) {
-            console.error(error);
+            console.error("Error adding product to cart:", error.message);
             alert("Failed to add product to cart. Please try again.");
           }
         },
-        
       },
       async mounted() {
-        // Get product ID from URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = urlParams.get('id');
-        
-        if (productId) {
-          await this.fetchProductById(productId); // Fetch product data by ID
-        } else {
-          console.error('Product ID not found in the URL');
-        }
-      }
-    }).mount('#product-section');
-  </script>
-  <!-- <script>
-    const { createApp } = Vue;
-
-    createApp({
-      data() {
-        return {
-          quantity: 1, // Initial quantity
-        };
-      },
-      methods: {
-        increaseQuantity() {
-          this.quantity++;
-        },
-        decreaseQuantity() {
-          if (this.quantity > 1) {
-            this.quantity--;
+        // Ambil data user dari localStorage
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+          const parsedData = JSON.parse(userData);
+          console.log("User Data:", parsedData);
+  
+          // Set user_id dan access_token ke data Vue
+          this.user_id = parsedData.user_id;
+          this.access_token = parsedData.access_token;
+  
+          // Get product ID from URL parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const productId = urlParams.get("id");
+  
+          if (productId) {
+            await this.fetchProductById(productId); // Fetch product data by ID
+          } else {
+            console.error("Product ID not found in the URL");
           }
+        } else {
+          console.warn("No user data found. Redirecting to login page.");
+          window.location.href = "login.html"; // Redirect jika belum login
         }
-      }
-    }).mount('#product-section'); // Mount to the section with the id 'product-section'
-    
-    // Handle login form submission
-    document.getElementById('login-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Login failed');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Login successful');
-        localStorage.setItem('access_token', data.access_token);
-        fetchProductList(); // Fetch the product list after login
-      })
-      .catch(error => {
-        console.error('Error during login:', error);
-      });
-    });
-
-    // Function to fetch product list with authorization
-    function fetchProductById(id) {
-      fetch(`http://localhost:8000/produk/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        const productList = document.getElementById('product-list');
-        productList.innerHTML = ''; // Clear any existing content
-        data.forEach(item => {
-          const productItem = document.createElement('div');
-          productItem.innerHTML = `
-            <h2>${item.nama}</h2>
-            <p>Description: ${item.deskripsi}</p>
-            <p>Stock: ${item.stok}</p>
-            <p>Price: ${item.harga}</p>
-            <img src="${item.gambar}" alt="${item.nama}" width="300">
-            <p>Category ID: ${item.kategori}</p>
-            <hr>
-          `;
-          productList.appendChild(productItem);
-        });
-      })
-      .catch(error => {
-        console.error('There has been a problem with fetching the product list:', error);
-      });
-    }
-  </script> -->
+      },
+    }).mount("#product-section");
+  </script>
 
   <script src="js/jquery-1.11.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
