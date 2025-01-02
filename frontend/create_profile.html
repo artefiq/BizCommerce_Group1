@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Create Profile - Waggy</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <!-- Wrapper untuk layout yang terpusat -->
+  <div class="d-flex align-items-center justify-content-center vh-100 bg-light">
+    <div class="col-md-6 col-lg-5 bg-white p-4 rounded-4 shadow-sm">
+      <!-- Judul Halaman -->
+      <h2 class="text-center secondary-font text-primary mb-4">Create Profile</h2>
+
+      <!-- Form untuk Membuat Profil -->
+      <form id="createProfileForm" onsubmit="return createProfile(event)">
+        <!-- Input Nama -->
+        <div class="mb-3">
+          <label for="nama" class="form-label text-muted">Nama</label>
+          <input type="text" class="form-control form-control-lg" id="nama" placeholder="Masukkan Nama" required>
+        </div>
+
+        <!-- Input Alamat -->
+        <div class="mb-3">
+          <label for="alamat" class="form-label text-muted">Alamat</label>
+          <input type="text" class="form-control form-control-lg" id="alamat" placeholder="Masukkan Alamat" required>
+        </div>
+
+        <!-- Input Nomor Telepon -->
+        <div class="mb-3">
+          <label for="no_telp" class="form-label text-muted">Nomor Telepon</label>
+          <input type="text" class="form-control form-control-lg" id="no_telp" placeholder="Masukkan Nomor Telepon" required>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-lg">Create Profile</button>
+        </div>
+
+        <!-- Pesan Respons -->
+        <div id="responseMessage" class="alert text-center mt-3" style="display: none;"></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+  <script>
+
+    // Retrieve user_id from localStorage
+    const user_id = JSON.parse(localStorage.getItem("userData"))?.user_id;
+
+    // Check if user_id exists in localStorage
+    async function load_user() {
+        if (!user_id) {
+            alert("User is not logged in. Please log in first.");
+            window.location.href = "login.html"; // Redirect to login if user_id is missing
+        } else {
+            // Load profile data for editing
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/profile/${user_id}`);
+                if (response.ok) {
+                    window.location.href = "index.html"; // Redirect jika belum login
+                }
+            } catch (error) {
+                console.error("Error fetching profile:", error);
+                alert("An unexpected error occurred while loading profile.");
+            }
+        }
+    }
+    
+    // Call loadProfile when the page loads
+    document.addEventListener("DOMContentLoaded", load_user);
+
+    async function createProfile(event) {
+        event.preventDefault(); // Mencegah refresh halaman
+
+        const nama = document.getElementById("nama").value;
+        const role = "user";
+        const alamat = document.getElementById("alamat").value;
+        const no_telp = document.getElementById("no_telp").value;
+
+        const requestData = {
+            user_id,
+            role,
+            nama,
+            alamat,
+            no_telp
+        };
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/profile/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
+            });
+
+            const responseMessage = document.getElementById("responseMessage");
+
+            if (response.ok) {
+            const result = await response.json();
+            responseMessage.className = "alert alert-success";
+            responseMessage.textContent = `Profile created successfully! ID: ${result.id}`;
+            } else {
+            const errorData = await response.json();
+            responseMessage.className = "alert alert-danger";
+            responseMessage.textContent = `Error: ${errorData.detail[0]?.msg || "Failed to create profile"}`;
+            }
+
+            responseMessage.style.display = "block";
+        } catch (error) {
+            console.error("Error:", error);
+            const responseMessage = document.getElementById("responseMessage");
+            responseMessage.className = "alert alert-danger";
+            responseMessage.textContent = "An unexpected error occurred.";
+            responseMessage.style.display = "block";
+        }
+        }
+  </script>
+</body>
+
+</html>
