@@ -367,7 +367,7 @@
 
             <div class="d-flex flex-wrap">
               <a href="#" class="btn-cart me-2 px-2 pt-2 pb-2">
-                <h6 class="m-0">Add to Cart</h6>
+                <h6 class="m-0" @click="addToCart">Add to Cart</h6>
               </a>
             </div>
           </div>
@@ -574,6 +574,7 @@
             this.quantity--;
           }
         },
+
         // Function to fetch product data by ID
         async fetchProductById(id) {
           try{
@@ -592,7 +593,40 @@
           catch(error) {
             console.error(error.message);
           }
-        }
+        },
+
+        // Function add product to cart
+        async addToCart() {
+          /*const userId = localStorage.getItem('user_id'); // Ambil user_id dari localStorage (atau sumber lain)
+          if (!userId) {
+            alert("Please login first!");
+            return;
+          }*/
+          if (!this.id || !this.quantity) {
+            alert("Invalid product or quantity.");
+            return;
+          }
+
+          const payload = {
+            //user_id: parseInt(localStorage.getItem("user_id")), // Assume user ID is stored in localStorage
+            produk_id: this.id,
+            qty: this.quantity,
+          };
+
+          try {
+            const response = await axios.post("http://localhost:8000/keranjang/", payload, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              },
+            });
+            alert("Product added to cart successfully!");
+            console.log(response.data);
+          } catch (error) {
+            console.error(error);
+            alert("Failed to add product to cart. Please try again.");
+          }
+        },
+        
       },
       async mounted() {
         // Get product ID from URL parameters
