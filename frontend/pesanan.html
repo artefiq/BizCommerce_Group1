@@ -471,6 +471,57 @@
     </div>
   </section>
 
+   <div id="app">
+    <h1>Detail Pesanan</h1>
+    <div v-for="order in orders" :key="order.id" class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);">
+      <table style="width: 100%; table-layout: fixed;">
+        <tr>
+          <td style="text-align: left; width: 50%; padding: 10px;">
+            <strong>{{ order.date }}</strong>
+          </td>
+          <td style="text-align: right; width: 50%; padding: 10px;">
+            <strong>Order ID: {{ order.id }}</strong>
+          </td>
+        </tr>
+      </table>
+      <table style="width: 100%; table-layout: fixed;">
+        <tr>
+          <td style="width: 15%; padding: 20;">
+            <img :src="order.productImage" alt="Product Image" style="width: 150px; height: 150px;" class="rounded-4">
+          </td>
+          <td style="width: 70%; padding: 10px;">
+            <table style="width:100%">
+              <tr>
+                <td style="text-align: left; width: 50%; padding: 10px;"><strong>Nama Produk</strong></td>
+                <td style="text-align: right; width: 50%; padding: 10px;"><div>x {{ order.quantity }}</div></td>
+              </tr>
+              <tr>
+                <td style="text-align: left; width: 50%; padding: 10px;"></td>
+                <td style="text-align: right; width: 50%; padding: 10px;"><div>Rp {{ order.price }}</div></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left; width: 50%; padding: 10px;">
+            <strong>Status :</strong> {{ order.status }}
+          </td>
+          <td style="text-align: right; width: 50%; padding: 10px;">
+            <strong>Total Pesanan :</strong> Rp {{ order.total }}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" class="text-end" style="padding: 10px;">
+            <button v-if="order.status === 'Belum Dibayar'" class="btn btn-primary" @click="handleButtonAction(order)">Bayar</button>
+            <button v-if="order.status === 'Dikonfirmasi' || order.status === 'Dikirimkan'" class="btn btn-secondary" disabled>Bayar</button>
+            <button v-if="order.status === 'Sudah Sampai'" class="btn btn-success" @click="handleButtonAction(order)">Konfirmasi Terima</button>
+            <button v-if="order.status === 'Belum Dibayar'" class="btn btn-danger" @click="cancelOrder(order.id)">Batal</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
   <footer id="footer" class="my-5">
     <div class="container py-5 my-5">
       <div class="row">
