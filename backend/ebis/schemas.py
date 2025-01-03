@@ -111,6 +111,7 @@ class Review(ReviewBase):
 # PesananDetails
 
 class PesananDetailBase(BaseModel):
+    pesanan_id: int
     produk_id: int
     qty: int
     harga: int
@@ -135,10 +136,11 @@ class PesananBase(BaseModel):
     status_pesanan: str
 
 class PesananCreate(PesananBase):
-    detail: List[PesananDetailCreate]  # Menggunakan schema PesananDetailCreate
+    pass
+    # detail: List[PesananDetailCreate]  # Menggunakan schema PesananDetailCreate
 
 class PesananUpdate(PesananBase):
-    status_pesanan: Optional[str]
+    status_pesanan: str
 
 class Pesanan(PesananBase):
     id: int
