@@ -693,90 +693,89 @@
   }  
 
     async function renderOrders(orders) {
-        for (const order of orders) {
-            const { id, tanggal, waktu, status_pesanan, detail_pesanan } = order;
+      // Filter orders to exclude 'dibatalkan' and 'dibayar'
+      const filteredOrders = orders.filter(order => !["dibatalkan", "selesai"].includes(order.status_pesanan));
 
-            const totalPrice = detail_pesanan.reduce((sum, item) => sum + item.qty * item.harga, 0);
+      for (const order of filteredOrders) {
+          const { id, tanggal, waktu, status_pesanan, detail_pesanan } = order;
 
-            let productsHTML = "";
+          const totalPrice = detail_pesanan.reduce((sum, item) => sum + item.qty * item.harga, 0);
 
-            for (const item of detail_pesanan) {
-                const product = await fetchProduct(item.produk_id);
-                if (product) {
-                    productsHTML += `
-                    <tr>
-                        <td style="width: 15%; padding: 20px;">
-                            <img src="${product.gambar}" alt="Gambar Produk" style="width: 150px; height: 150px;" class="rounded-4">
-                        </td>
-                        <td style="width: 70%; padding: 10px;">
-                            <table style="width:100%">
-                                <tr>
-                                    <td style="text-align: left; width: 50%; padding: 10px;">
-                                        <strong>${product.nama}</strong>
-                                    </td>
-                                    <td style="text-align: right; width: 50%; padding: 10px;">x ${item.qty}</td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td style="text-align: right; width: 50%; padding: 10px;">Rp ${item.harga.toLocaleString()}</td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    `;
-                }
-            }
+          let productsHTML = "";
 
-            let buttonsHTML = "";
+          for (const item of detail_pesanan) {
+              const product = await fetchProduct(item.produk_id);
+              if (product) {
+                  productsHTML += `
+                  <tr>
+                      <td style="width: 15%; padding: 20px;">
+                          <img src="${product.gambar}" alt="Gambar Produk" style="width: 150px; height: 150px;" class="rounded-4">
+                      </td>
+                      <td style="width: 70%; padding: 10px;">
+                          <table style="width:100%">
+                              <tr>
+                                  <td style="text-align: left; width: 50%; padding: 10px;">
+                                      <strong>${product.nama}</strong>
+                                  </td>
+                                  <td style="text-align: right; width: 50%; padding: 10px;">x ${item.qty}</td>
+                              </tr>
+                              <tr>
+                                  <td></td>
+                                  <td style="text-align: right; width: 50%; padding: 10px;">Rp ${item.harga.toLocaleString()}</td>
+                              </tr>
+                          </table>
+                      </td>
+                  </tr>
+                  `;
+              }
+          }
 
-            if (status_pesanan === "pending") {
-                buttonsHTML = `
-                    <button class="btn btn-primary" onclick="updateOrderStatus(${id}, 'dibayar')">Bayar</button>
-                    <button class="btn btn-danger" onclick="updateOrderStatus(${id}, 'dibatalkan')">Batal</button>
-                `;
-            } else if (status_pesanan === "dibayar") {
-                buttonsHTML = `
-                    <button class="btn btn-success" onclick="updateOrderStatus(${id}, 'dikirim')">Kirim</button>
-                `;
-            } else if (status_pesanan === "dikirim") {
-                buttonsHTML = `
-                    <button class="btn btn-info" onclick="updateOrderStatus(${id}, 'selesai')">Selesai</button>
-                `;
-            }
+          let buttonsHTML = "";
 
-            const orderHTML = `
-                <table style="width: 100%; table-layout: fixed;">
-                    <tr>
-                        <td style="text-align: left; width: 50%; padding: 10px;">
-                            <strong>${tanggal}, ${new Date(waktu).toLocaleTimeString()}</strong>
-                        </td>
-                        <td style="text-align: right; width: 50%; padding: 10px;">
-                            <strong>Order ID: ${id}</strong>
-                        </td>
-                    </tr>
-                </table>
-                <table style="width: 100%; table-layout: fixed;">
-                    ${productsHTML}
-                    <tr>
-                        <td style="text-align: left; width: 50%; padding: 10px;">
-                            <strong>Status :</strong> ${status_pesanan}
-                        </td>
-                        <td style="text-align: right; width: 50%; padding: 10px;">
-                            <strong>Total Pesanan :</strong> Rp ${totalPrice.toLocaleString()}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="text-end" style="padding: 10px;">
-                            ${buttonsHTML}
-                        </td>
-                    </tr>
-                </table>
-                <hr/>
-            `;
+          if (status_pesanan === "pending") {
+              buttonsHTML = `
+                  <button class="btn btn-primary" onclick="updateOrderStatus(${id}, 'dibayar')">Bayar</button>
+                  <button class="btn btn-danger" onclick="updateOrderStatus(${id}, 'dibatalkan')">Batal</button>
+              `;
+          } else if (status_pesanan === "dikirim") {
+              buttonsHTML = `
+                  <button class="btn btn-info" onclick="updateOrderStatus(${id}, 'selesai')">Selesai</button>
+              `;
+          }
 
-            orderContainer.innerHTML += orderHTML;
-        }
-    }
+          const orderHTML = `
+              <table style="width: 100%; table-layout: fixed;">
+                  <tr>
+                      <td style="text-align: left; width: 50%; padding: 10px;">
+                          <strong>${tanggal}, ${new Date(waktu).toLocaleTimeString()}</strong>
+                      </td>
+                      <td style="text-align: right; width: 50%; padding: 10px;">
+                          <strong>Order ID: ${id}</strong>
+                      </td>
+                  </tr>
+              </table>
+              <table style="width: 100%; table-layout: fixed;">
+                  ${productsHTML}
+                  <tr>
+                      <td style="text-align: left; width: 50%; padding: 10px;">
+                          <strong>Status :</strong> ${status_pesanan}
+                      </td>
+                      <td style="text-align: right; width: 50%; padding: 10px;">
+                          <strong>Total Pesanan :</strong> Rp ${totalPrice.toLocaleString()}
+                      </td>
+                  </tr>
+                  <tr>
+                      <td colspan="2" class="text-end" style="padding: 10px;">
+                          ${buttonsHTML}
+                      </td>
+                  </tr>
+              </table>
+              <hr/>
+          `;
+
+          orderContainer.innerHTML += orderHTML;
+      }
+  }
 
     fetchOrders();
 </script>
