@@ -110,6 +110,9 @@ def create_keranjang(db: Session, keranjang: schemas.KeranjangCreate):
 def get_keranjang(db: Session, keranjang_id: int):
     return db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).first()
 
+def get_keranjang_by_user(db: Session, user_id: int):
+    return db.query(models.Keranjang).filter(models.Keranjang.user_id == user_id).all()
+
 def get_all_keranjang(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Keranjang).offset(skip).limit(limit).all()
 
@@ -124,6 +127,10 @@ def update_keranjang(db: Session, keranjang_id: int, keranjang: schemas.Keranjan
 
 def delete_keranjang(db: Session, keranjang_id: int):
     db.query(models.Keranjang).filter(models.Keranjang.id == keranjang_id).delete()
+    db.commit()
+
+def delete_keranjang_by_user(db: Session, user_id: int):
+    db.query(models.Keranjang).filter(models.Keranjang.user_id == user_id).delete()
     db.commit()
 
 #######################################################################################################

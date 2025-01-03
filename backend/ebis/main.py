@@ -160,6 +160,13 @@ def read_keranjang(keranjang_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Keranjang not found")
     return db_keranjang
 
+@app.get("/keranjang_by_user/{user_id}", response_model=list[schemas.Keranjang])
+def get_keranjang_by_user(user_id: int, db: Session = Depends(get_db)):
+    db_keranjang = crud.get_keranjang_by_user(db, user_id=user_id)
+    if db_keranjang is None:
+        raise HTTPException(status_code=404, detail="Keranjang not found")
+    return db_keranjang
+
 @app.get("/keranjang/", response_model=List[schemas.Keranjang])
 def read_all_keranjang(db: Session = Depends(get_db)):
     return crud.get_all_keranjang(db)
@@ -224,6 +231,40 @@ def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session 
 def delete_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
     crud.delete_pesanan(db, pesanan_id=pesanan_id)
     return {"message": "Pesanan deleted"}
+
+@app.post("/pesanan/checkout/{user_id}", response_model=List[schemas.Pesanan])
+def checkout(user_id: int, db: Session = Depends(get_db)):
+    # Ambil semua item dalam keranjang berdasarkan user_id
+    keranjang_items = crud.get_keranjang_by_user(db, user_id=user_id)
+    if not keranjang_items:
+        raise HTTPException(status_code=404, detail="Keranjang is empty")
+    
+    pesanan_list = []
+    try:
+        for item in keranjang_items:
+            # Validasi data produk dari keranjang
+            produk = crud.get_produk(db, produk_id=item.produk_id)
+            if not produk:
+                raise HTTPException(status_code=400, detail=f"Produk with ID {item.produk_id} not found")
+            
+            # Buat entri pesanan baru berdasarkan data di keranjang
+            pesanan_data = schemas.PesananCreate(
+                user_id=item.user_id,
+                produk_id=item.produk_id,
+                quantity=item.qty,
+                total_harga=produk.harga * item.qty
+            )
+            pesanan = crud.create_pesanan(db=db, pesanan=pesanan_data)
+            pesanan_list.append(pesanan)
+
+        # Hapus semua item keranjang setelah dipindahkan
+        crud.delete_keranjang_by_user(db, user_id=user_id)
+    except Exception as e:
+        db.rollback()  # Batalkan perubahan jika terjadi kesalahan
+        raise HTTPException(status_code=500, detail=str(e))
+    else:
+        db.commit()  # Commit perubahan jika semua berhasil
+        return pesanan_list
 
 # -------------------- KATEGORI CRUD Endpoints --------------------
 
