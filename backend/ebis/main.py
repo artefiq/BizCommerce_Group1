@@ -259,8 +259,8 @@ def checkout(user_id: int, db: Session = Depends(get_db)):
         pesanan_data = schemas.PesananCreate(
             user_id=user_id,
             metode_bayar_id=1,  # Sesuaikan metode pembayaran
-            tanggal=datetime.now().date().isoformat(),
-            waktu=datetime.now().time().isoformat(),
+            tanggal=datetime.datetime.now().date().isoformat(),  # Gunakan datetime.datetime
+            waktu=datetime.datetime.now().time().isoformat(),  # Gunakan datetime.datetime
             status_pesanan="pending",  # Status awal
             total_harga=0,  # Akan dihitung ulang nanti
         )
