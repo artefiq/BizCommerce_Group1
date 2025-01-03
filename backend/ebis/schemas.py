@@ -108,6 +108,24 @@ class Review(ReviewBase):
         from_attributes = True
 
 ###############################
+# PesananDetails
+
+class PesananDetailBase(BaseModel):
+    pesanan_id: int
+    produk_id: int
+    qty: int
+    harga: int
+
+class PesananDetailCreate(PesananDetailBase):
+    pass
+
+class PesananDetail(PesananDetailBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+###############################
 # Pesanan
 
 class PesananBase(BaseModel):
@@ -118,14 +136,15 @@ class PesananBase(BaseModel):
     status_pesanan: str
 
 class PesananCreate(PesananBase):
-    detail: List[dict]
+    pass
+    # detail: List[PesananDetailCreate]  # Menggunakan schema PesananDetailCreate
 
 class PesananUpdate(PesananBase):
-    status_pesanan: Optional[str]
+    status_pesanan: str
 
 class Pesanan(PesananBase):
     id: int
-    detail_pesanan: List[dict]
+    detail_pesanan: List[PesananDetail]  # Menggunakan schema PesananDetail
 
     class Config:
         from_attributes = True
