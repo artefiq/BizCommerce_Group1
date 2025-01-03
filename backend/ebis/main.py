@@ -355,7 +355,7 @@ def delete_metode(metode_id: int, db: Session = Depends(get_db)):
 
 @app.get("/pesanan/history/{user_id}", response_model=List[schemas.Pesanan])
 def read_order_history(user_id: int, db: Session = Depends(get_db)):
-    db_orders = crud.get_orders_by_user_and_status(db, user_id=user_id, status="Selesai")
+    db_orders = crud.get_orders_by_user_and_status(db, user_id=user_id, status_pesanan="Selesai")
     if not db_orders:
         raise HTTPException(status_code=404, detail="No completed orders found for this user")
     return db_orders

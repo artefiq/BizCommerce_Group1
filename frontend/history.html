@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  <title>History - UTS Ebis</title>
+  <title>Detail - UTS Ebis</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -156,6 +156,7 @@
   <header>
     <div class="container py-2">
       <div class="row py-4 pb-0 pb-sm-4 align-items-center ">
+
         <div class="col-sm-4 col-lg-3 text-center text-sm-start">
           <div class="main-logo">
             <a href="index.html">
@@ -163,7 +164,8 @@
             </a>
           </div>
         </div>
-      <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block">
+
+        <div class="col-sm-6 offset-sm-2 offset-md-0 col-lg-5 d-none d-lg-block">
           <div class="search-bar border rounded-2 px-3 border-dark-subtle">
             <form id="search-form" class="text-center d-flex align-items-center" action="" method="">
               <input type="text" class="form-control border-0 bg-transparent"
@@ -277,10 +279,10 @@
                 <a href="index.html" class="nav-link">Blog</a>
               </li>
               <li class="nav-item">
-                <a href="pesanan.html" class="nav-link">Orders</a>
+                <a href="index.html" class="nav-link">Orders</a>
               </li>
               <li class="nav-item">
-                <a href="history.html" class="nav-link">History</a>
+                <a href="index.html" class="nav-link">History</a>
               </li>
             </ul>
 
@@ -321,182 +323,132 @@
     </div>
   </header>
 
-  <section id="history-section" class="my-5">
-    <div class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);">
-      <h2 class="text-center">Order History</h2>
-      <div v-if="orders.length === 0" class="text-center">
-        <p>No orders found.</p>
+  <section id="order-section" class="my-5">
+    <div class="container mt-3 rounded-4" style="background-color: rgb(251, 249, 241);" id="order-container">
+      <!-- Pesanan akan dimuat di sini oleh JavaScript -->
+    </div>
+  </section>
+
+  
+
+  <section id="insta" class="my-5">
+    <div class="row g-0 py-5">
+      <div class="col instagram-item  text-center position-relative">
+        <div class="icon-overlay d-flex justify-content-center position-absolute">
+          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
+        </div>
+        <a href="#">
+          <img :src="images/insta1.jpg" alt="insta-img" class="img-fluid rounded-3">
+        </a>
       </div>
-      <div v-for="order in orders" :key="order.id" class="order-item mt-4">
-        <table style="width: 100%; table-layout: fixed;">
-          <tr>
-            <td style="text-align: left; width: 50%; padding: 10px;">
-              <strong>{{ order.tanggal }}</strong>
-            </td>
-            <td style="text-align: right; width: 50%; padding: 10px;">
-              <strong>Order ID: {{ order.id }}</strong>
-            </td>
-          </tr>
-        </table>
-        <table style="width: 100%; table-layout: fixed;">
-          <tr>
-            <td style="width: 15%; padding: 20;">
-              <div style="background-color: #DEAD6F; width: 150px; height: 150px;" class="rounded-4"></div>
-            </td>
-            <td style="width: 70%; padding: 10px;">
-              <table style="width:100%">
-                <tr>
-                  <td style="text-align: left; width: 50%; padding: 10px;">
-                    <strong>{{ order.productName }}</strong>
-                  </td>
-                  <td style="text-align: right; width: 50%; padding: 10px;">
-                    <div>x {{ order.quantity }}</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="text-align: left; width: 50%; padding: 10px;"></td>
-                  <td style="text-align: right; width: 50%; padding: 10px;">
-                    <div>Rp {{ order.price.toLocaleString('id-ID') }}</div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="text-align: left; width: 50%; padding: 10px;">
-              <strong>Status :</strong> {{ order.status }}
-            </td>
-            <td style="text-align: right; width: 50%; padding: 10px;">
-              <strong>Total Pesanan :</strong> Rp {{ order.total.toLocaleString('id-ID') }}
-            </td>
-          </tr>
-          <tr>
-            <td colspan="2" class="text-end" style="padding: 10px;">
-              <a :href="'order-detail.html?id=' + order.id" class="btn btn-primary">Lihat Detail</a>
-            </td>
-          </tr>
-        </table>
+      <div class="col instagram-item  text-center position-relative">
+        <div class="icon-overlay d-flex justify-content-center position-absolute">
+          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
+        </div>
+        <a href="#">
+          <img src="images/insta2.jpg" alt="insta-img" class="img-fluid rounded-3">
+        </a>
+      </div>
+      <div class="col instagram-item  text-center position-relative">
+        <div class="icon-overlay d-flex justify-content-center position-absolute">
+          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
+        </div>
+        <a href="#">
+          <img src="images/insta3.jpg" alt="insta-img" class="img-fluid rounded-3">
+        </a>
+      </div>
+      <div class="col instagram-item  text-center position-relative">
+        <div class="icon-overlay d-flex justify-content-center position-absolute">
+          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
+        </div>
+        <a href="#">
+          <img src="images/insta4.jpg" alt="insta-img" class="img-fluid rounded-3">
+        </a>
+      </div>
+      <div class="col instagram-item  text-center position-relative">
+        <div class="icon-overlay d-flex justify-content-center position-absolute">
+          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
+        </div>
+        <a href="#">
+          <img src="images/insta5.jpg" alt="insta-img" class="img-fluid rounded-3">
+        </a>
+      </div>
+      <div class="col instagram-item  text-center position-relative">
+        <div class="icon-overlay d-flex justify-content-center position-absolute">
+          <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
+        </div>
+        <a href="#">
+          <img src="images/insta6.jpg" alt="insta-img" class="img-fluid rounded-3">
+        </a>
       </div>
     </div>
   </section>
 
+  <footer id="footer" class="my-5">
+    <div class="container py-5 my-5">
+      <div class="row">
 
-    <section id="insta" class="my-5">
-      <div class="row g-0 py-5">
-        <div class="col instagram-item  text-center position-relative">
-          <div class="icon-overlay d-flex justify-content-center position-absolute">
-            <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-          </div>
-          <a href="#">
-            <img :src="images/insta1.jpg" alt="insta-img" class="img-fluid rounded-3">
-          </a>
-        </div>
-        <div class="col instagram-item  text-center position-relative">
-          <div class="icon-overlay d-flex justify-content-center position-absolute">
-            <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-          </div>
-          <a href="#">
-            <img src="images/insta2.jpg" alt="insta-img" class="img-fluid rounded-3">
-          </a>
-        </div>
-        <div class="col instagram-item  text-center position-relative">
-          <div class="icon-overlay d-flex justify-content-center position-absolute">
-            <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-          </div>
-          <a href="#">
-            <img src="images/insta3.jpg" alt="insta-img" class="img-fluid rounded-3">
-          </a>
-        </div>
-        <div class="col instagram-item  text-center position-relative">
-          <div class="icon-overlay d-flex justify-content-center position-absolute">
-            <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-          </div>
-          <a href="#">
-            <img src="images/insta4.jpg" alt="insta-img" class="img-fluid rounded-3">
-          </a>
-        </div>
-        <div class="col instagram-item  text-center position-relative">
-          <div class="icon-overlay d-flex justify-content-center position-absolute">
-            <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-          </div>
-          <a href="#">
-            <img src="images/insta5.jpg" alt="insta-img" class="img-fluid rounded-3">
-          </a>
-        </div>
-        <div class="col instagram-item  text-center position-relative">
-          <div class="icon-overlay d-flex justify-content-center position-absolute">
-            <iconify-icon class="text-white" icon="la:instagram"></iconify-icon>
-          </div>
-          <a href="#">
-            <img src="images/insta6.jpg" alt="insta-img" class="img-fluid rounded-3">
-          </a>
-        </div>
-      </div>
-    </section>
-  
-    <footer id="footer" class="my-5">
-      <div class="container py-5 my-5">
-        <div class="row">
-          <div class="col-md-3">
-            <div class="footer-menu">
-              <img src="images/logo.png" alt="logo">
-              <p class="blog-paragraph fs-6 mt-3">Subscribe to our newsletter to get updates about our grand offers.</p>
-              <div class="social-links">
-                <ul class="d-flex list-unstyled gap-2">
-                  <li class="social">
-                    <a href="#">
-                      <iconify-icon class="social-icon" icon="ri:facebook-fill"></iconify-icon>
-                    </a>
-                  </li>
-                  <li class="social">
-                    <a href="#">
-                      <iconify-icon class="social-icon" icon="ri:twitter-fill"></iconify-icon>
-                    </a>
-                  </li>
-                  <li class="social">
-                    <a href="#">
-                      <iconify-icon class="social-icon" icon="ri:pinterest-fill"></iconify-icon>
-                    </a>
-                  </li>
-                  <li class="social">
-                    <a href="#">
-                      <iconify-icon class="social-icon" icon="ri:instagram-fill"></iconify-icon>
-                    </a>
-                  </li>
-                  <li class="social">
-                    <a href="#">
-                      <iconify-icon class="social-icon" icon="ri:youtube-fill"></iconify-icon>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="footer-menu">
-              <h3>Quick Links</h3>
-              <ul class="menu-list list-unstyled">
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Home</a>
+        <div class="col-md-3">
+          <div class="footer-menu">
+            <img src="images/logo.png" alt="logo">
+            <p class="blog-paragraph fs-6 mt-3">Subscribe to our newsletter to get updates about our grand offers.</p>
+            <div class="social-links">
+              <ul class="d-flex list-unstyled gap-2">
+                <li class="social">
+                  <a href="#">
+                    <iconify-icon class="social-icon" icon="ri:facebook-fill"></iconify-icon>
+                  </a>
                 </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">About us</a>
+                <li class="social">
+                  <a href="#">
+                    <iconify-icon class="social-icon" icon="ri:twitter-fill"></iconify-icon>
+                  </a>
                 </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Offer</a>
+                <li class="social">
+                  <a href="#">
+                    <iconify-icon class="social-icon" icon="ri:pinterest-fill"></iconify-icon>
+                  </a>
                 </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Services</a>
+                <li class="social">
+                  <a href="#">
+                    <iconify-icon class="social-icon" icon="ri:instagram-fill"></iconify-icon>
+                  </a>
                 </li>
-                <li class="menu-item">
-                  <a href="#" class="nav-link">Contact Us</a>
+                <li class="social">
+                  <a href="#">
+                    <iconify-icon class="social-icon" icon="ri:youtube-fill"></iconify-icon>
+                  </a>
                 </li>
+
               </ul>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="footer-menu">
-              <h3>Help Center</h3>
+        </div>
+        <div class="col-md-3">
+          <div class="footer-menu">
+            <h3>Quick Links</h3>
+            <ul class="menu-list list-unstyled">
+              <li class="menu-item">
+                <a href="#" class="nav-link">Home</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="nav-link">About us</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="nav-link">Offer </a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="nav-link">Services</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="nav-link">Conatct Us</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="footer-menu">
+            <h3>Help Center</h5>
               <ul class="menu-list list-unstyled">
                 <li class="menu-item">
                   <a href="#" class="nav-link">FAQs</a>
@@ -514,94 +466,302 @@
                   <a href="#" class="nav-link">Delivery Information</a>
                 </li>
               </ul>
-            </div>
           </div>
-          <div class="col-md-3">
-            <div>
-              <h3>Our Newsletter</h3>
-              <p class="blog-paragraph fs-6">Subscribe to our newsletter to get updates about our grand offers.</p>
-              <div class="search-bar border rounded-pill border-dark-subtle px-2">
-                <form class="text-center d-flex align-items-center" action="" method="">
-                  <input type="text" class="form-control border-0 bg-transparent" placeholder="Enter your email here" />
-                  <iconify-icon class="send-icon" icon="tabler:location-filled"></iconify-icon>
-                </form>
-              </div>
+        </div>
+        <div class="col-md-3">
+          <div>
+            <h3>Our Newsletter</h3>
+            <p class="blog-paragraph fs-6">Subscribe to our newsletter to get updates about our grand offers.</p>
+            <div class="search-bar border rounded-pill border-dark-subtle px-2">
+              <form class="text-center d-flex align-items-center" action="" method="">
+                <input type="text" class="form-control border-0 bg-transparent" placeholder="Enter your email here" />
+                <iconify-icon class="send-icon" icon="tabler:location-filled"></iconify-icon>
+              </form>
             </div>
           </div>
         </div>
+
       </div>
-    </footer>
-  
-    <div id="footer-bottom">
-      <div class="container">
-        <hr class="m-0">
-        <div class="row mt-3">
-          <div class="col-md-6 copyright">
-            <p class="secondary-font">© 2023 Waggy. All rights reserved.</p>
-          </div>
-          <div class="col-md-6 text-md-end">
-            <p class="secondary-font">Free HTML Template by <a href="https://templatesjungle.com/" target="_blank"
-                class="text-decoration-underline fw-bold text-black-50">TemplatesJungle</a> Distributed by <a href="https://themewagon.com/" target="_blank"
-                class="text-decoration-underline fw-bold text-black-50">ThemeWagon</a></p>
-          </div>
+    </div>
+  </footer>
+
+  <div id="footer-bottom">
+    <div class="container">
+      <hr class="m-0">
+      <div class="row mt-3">
+        <div class="col-md-6 copyright">
+          <p class="secondary-font">© 2023 Waggy. All rights reserved.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="secondary-font">Free HTML Template by <a href="https://templatesjungle.com/" target="_blank"
+              class="text-decoration-underline fw-bold text-black-50"> TemplatesJungle</a> Distributed by <a href="https://themewagon.com/" target="_blank"
+              class="text-decoration-underline fw-bold text-black-50"> ThemeWagon</a></p>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Vue.js Instance -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const { createApp } = Vue;
   
-    <!-- Vue.js Instance -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-      const { createApp } = Vue;
-  
-      createApp({
-        data() {
-          return {
-            orders: [], // Array to hold order history
-            user_id: null, // User ID
-            access_token: null, // Access Token
-          };
+    createApp({
+      data() {
+        return {
+          quantity: 1, // Initial quantity
+          nama: "", // Product name
+          harga: "", // Product price
+          deskripsi: "", // Product description
+          gambar: "", // Product image URL
+          id: null, // Product ID
+          user_id: null, // User ID
+          access_token: null, // Access Token
+        };
+      },
+      methods: {
+        // Increase quantity
+        increaseQuantity() {
+          this.quantity++;
         },
-        methods: {
-          async fetchOrderHistory() {
-            try {
-              const response = await axios.get(`http://localhost:8000/pesanan/history/${this.user_id}`, {
-                headers: {
-                  Authorization: `Bearer ${this.access_token}`,
-                },
-              });
-              console.log("Fetched orders:", response.data); // Debugging line
-              this.orders = response.data; // Set orders data
-            } catch (error) {
-              console.error("Error fetching order history:", error.message);
-            }
-          },
-        },
-        async mounted() {
-          // Ambil data user dari localStorage
-          const userData = localStorage.getItem("userData");
-          if (userData) {
-            const parsedData = JSON.parse(userData);
-            this.user_id = parsedData.user_id;
-            this.access_token = parsedData.access_token;
-  
-            // Fetch order history
-            await this.fetchOrderHistory();
-          } else {
-            console.warn("No user data found. Redirecting to login page.");
-            window.location.href = "login.html"; // Redirect jika belum login
+        // Decrease quantity
+        decreaseQuantity() {
+          if (this.quantity > 1) {
+            this.quantity--;
           }
         },
-      }).mount("#history-section");
-    </script>
+        // Fetch product data by ID
+        async fetchProductById(id) {
+          try {
+            const response = await axios.get(`http://localhost:8000/produk/${id}`, {
+              headers: {
+                Authorization: `Bearer ${this.access_token}`,
+              },
+            });
+            const responseData = response.data;
+            this.id = id; // Set product ID
+            this.nama = responseData.nama;
+            this.harga = responseData.harga;
+            this.deskripsi = responseData.deskripsi;
+            this.gambar = responseData.gambar;
+          } catch (error) {
+            console.error("Error fetching product data:", error.message);
+          }
+        },
+        // Add product to cart
+        async addToCart() {
+          if (!this.id || !this.quantity || !this.user_id || !this.access_token) {
+            alert("Invalid product or user data.");
+            return;
+          }
   
-    <script src="js/jquery-1.11.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-      crossorigin="anonymous"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/script.js"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
-  </body>
+          const payload = {
+            user_id: this.user_id,
+            produk_id: this.id,
+            qty: this.quantity,
+          };
   
-  </html>  
+          try {
+            const response = await axios.post("http://localhost:8000/keranjang/", payload, {
+              headers: {
+                Authorization: `Bearer ${this.access_token}`,
+              },
+            });
+            alert("Product added to cart successfully!");
+          } catch (error) {
+            console.error("Error adding product to cart:", error.message);
+            alert("Failed to add product to cart. Please try again.");
+          }
+        },
+      },
+      async mounted() {
+        // Ambil data user dari localStorage
+        const userData = localStorage.getItem("userData");
+        if (userData) {
+          const parsedData = JSON.parse(userData);
+          console.log("User Data:", parsedData);
+  
+          // Set user_id dan access_token ke data Vue
+          this.user_id = parsedData.user_id;
+          this.access_token = parsedData.access_token;
+  
+          // Get product ID from URL parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const productId = urlParams.get("id");
+  
+          if (productId) {
+            await this.fetchProductById(productId); // Fetch product data by ID
+          } else {
+            console.error("Product ID not found in the URL");
+          }
+        } else {
+          console.warn("No user data found. Redirecting to login page.");
+          window.location.href = "login.html"; // Redirect jika belum login
+        }
+      },
+    }).mount("#product-section");
+  </script>
+
+  <script src="js/jquery-1.11.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+    crossorigin="anonymous"></script>
+  <script src="js/plugins.js"></script>
+  <script src="js/script.js"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <script>
+    // Retrieve user_id from localStorage
+    const userId = JSON.parse(localStorage.getItem("userData"))?.user_id;
+
+    // Check if user_id exists in localStorage
+    if (!userId) {
+        alert("User is not logged in. Please log in first.");
+        window.location.href = "login.html"; // Redirect to login if user_id is missing
+    }
+
+    const orderApiUrl = `http://localhost:8000/pesanan/user_id/${userId}`;
+    const productApiUrl = (produkId) => `http://localhost:8000/produk/${produkId}`;
+    const updateOrderApiUrl = (pesananId) => `http://localhost:8000/pesanan/${pesananId}`;
+    const orderContainer = document.getElementById("order-container");
+
+    async function fetchOrders() {
+        try {
+            const response = await fetch(orderApiUrl, { headers: { Accept: "application/json" } });
+            if (!response.ok) {
+                throw new Error("Failed to fetch orders");
+            }
+            const orders = await response.json();
+            renderOrders(orders);
+        } catch (error) {
+            console.error(error);
+            orderContainer.innerHTML = `<p>Error loading orders. Please try again later.</p>`;
+        }
+    }
+
+    async function fetchProduct(produkId) {
+        try {
+            const response = await fetch(productApiUrl(produkId), { headers: { Accept: "application/json" } });
+            if (!response.ok) {
+                throw new Error(`Failed to fetch product with ID ${produkId}`);
+            }
+            return response.json();
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+
+    async function updateOrderStatus(pesananId, statusPesanan) {
+      try {
+          // Ambil data pesanan berdasarkan ID
+          const getOrderResponse = await fetch(`http://localhost:8000/pesanan/${pesananId}`, {
+              headers: { Accept: "application/json" },
+          });
+  
+          if (!getOrderResponse.ok) {
+              throw new Error("Failed to fetch order details");
+          }
+  
+          const orderData = await getOrderResponse.json();
+  
+          // Update hanya status pesanan
+          const updatedOrderData = {
+              ...orderData,
+              status_pesanan: statusPesanan,
+          };
+  
+          // Kirim permintaan PUT untuk memperbarui data
+          const updateResponse = await fetch(`http://localhost:8000/pesanan/${pesananId}`, {
+              method: "PUT",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(updatedOrderData),
+          });
+  
+          if (!updateResponse.ok) {
+              throw new Error("Failed to update order status");
+          }
+  
+          alert(`Status updated to: ${statusPesanan}`);
+          location.reload(); // Reload halaman untuk memperbarui data
+      } catch (error) {
+          console.error(error);
+          alert("Failed to update order status. Please try again.");
+      }
+  }  
+
+  async function renderOrders(orders) {
+    // Filter orders to include only 'selesai'
+    const filteredOrders = orders.filter(order => order.status_pesanan === "selesai");
+
+    for (const order of filteredOrders) {
+        const { id, tanggal, waktu, status_pesanan, detail_pesanan } = order;
+
+        const totalPrice = detail_pesanan.reduce((sum, item) => sum + item.qty * item.harga, 0);
+
+        let productsHTML = "";
+
+        for (const item of detail_pesanan) {
+            const product = await fetchProduct(item.produk_id);
+            if (product) {
+                productsHTML += `
+                <tr>
+                    <td style="width: 15%; padding: 20px;">
+                        <img src="${product.gambar}" alt="Gambar Produk" style="width: 150px; height: 150px;" class="rounded-4">
+                    </td>
+                    <td style="width: 70%; padding: 10px;">
+                        <table style="width:100%">
+                            <tr>
+                                <td style="text-align: left; width: 50%; padding: 10px;">
+                                    <strong>${product.nama}</strong>
+                                </td>
+                                <td style="text-align: right; width: 50%; padding: 10px;">x ${item.qty}</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td style="text-align: right; width: 50%; padding: 10px;">Rp ${item.harga.toLocaleString()}</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                `;
+            }
+        }
+
+        const orderHTML = `
+            <table style="width: 100%; table-layout: fixed;">
+                <tr>
+                    <td style="text-align: left; width: 50%; padding: 10px;">
+                        <strong>${tanggal}, ${new Date(waktu).toLocaleTimeString()}</strong>
+                    </td>
+                    <td style="text-align: right; width: 50%; padding: 10px;">
+                        <strong>Order ID: ${id}</strong>
+                    </td>
+                </tr>
+            </table>
+            <table style="width: 100%; table-layout: fixed;">
+                ${productsHTML}
+                <tr>
+                    <td style="text-align: left; width: 50%; padding: 10px;">
+                        <strong>Status :</strong> ${status_pesanan}
+                    </td>
+                    <td style="text-align: right; width: 50%; padding: 10px;">
+                        <strong>Total Pesanan :</strong> Rp ${totalPrice.toLocaleString()}
+                    </td>
+                </tr>
+            </table>
+            <hr/>
+        `;
+
+        orderContainer.innerHTML += orderHTML;
+    }
+  }
+
+    fetchOrders();
+</script>
+
+</body>
+
+</html>
