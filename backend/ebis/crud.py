@@ -172,15 +172,34 @@ def create_pesanan(db: Session, pesanan: schemas.PesananCreate):
         tanggal=pesanan.tanggal,
         waktu=pesanan.waktu,
         status_pesanan=pesanan.status_pesanan,
-        detail_pesanan=pesanan.detail
     )
     db.add(db_pesanan)
     db.commit()
     db.refresh(db_pesanan)
     return db_pesanan
 
+def create_detail_pesanan(db: Session, detail_pesanan: schemas.PesananDetailCreate):
+    # Buat instance dari model detail pesanan
+    db_detail_pesanan = models.PesananDetail(
+        pesanan_id=detail_pesanan.pesanan_id,
+        produk_id=detail_pesanan.produk_id,
+        qty=detail_pesanan.qty,
+        harga=detail_pesanan.harga,
+    )
+    # Tambahkan data ke database
+    db.add(db_detail_pesanan)
+    db.commit()
+    db.refresh(db_detail_pesanan)
+    return db_detail_pesanan
+
 def get_pesanan(db: Session, pesanan_id: int):
     return db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).options(joinedload(models.Pesanan.detail_pesanan)).first()
+
+def get_pesanan_user_id(db: Session, user_id: int):
+    return db.query(models.Pesanan).filter(models.Pesanan.user_id == user_id).all()
+
+def get_detail_pesanan_pesanan_id(db: Session, pesanan_id: int):
+    return db.query(models.PesananDetail).filter(models.PesananDetail.pesanan_id == pesanan_id).all()
 
 def get_all_pesanan(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Pesanan).offset(skip).limit(limit).all()
@@ -193,6 +212,16 @@ def update_pesanan(db: Session, pesanan_id: int, pesanan: schemas.PesananUpdate)
         db.commit()
         db.refresh(db_pesanan)
     return db_pesanan
+
+def update_pesanan_total_harga(db: Session, pesanan_id: int, total_harga: float):
+    pesanan = db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).first()
+    
+    if pesanan:
+        pesanan.total_harga = total_harga
+        db.commit()
+        db.refresh(pesanan)  # Memperbarui objek setelah commit
+
+    return pesanan
 
 def delete_pesanan(db: Session, pesanan_id: int):
     db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).delete()

@@ -4,7 +4,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-import crud, models, schemas, datetime
+import crud, models, schemas
+from datetime import datetime
 from database import SessionLocal, engine
 from jose import jwt
 
@@ -219,9 +220,23 @@ def read_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Pesanan not found")
     return db_pesanan
 
+@app.get("/pesanan/user_id/{user_id}", response_model=List[schemas.Pesanan])
+def read_pesanan_user_id(user_id: int, db: Session = Depends(get_db)):
+    return crud.get_pesanan_user_id(db, user_id=user_id)
+    # if db_pesanan is None:
+    #     raise HTTPException(status_code=404, detail="Pesanan not found")
+    # return db_pesanan
+
 @app.get("/pesanan/", response_model=List[schemas.Pesanan])
 def read_all_pesanan(db: Session = Depends(get_db)):
     return crud.get_all_pesanan(db)
+
+@app.get("/pesanan_detail/pesanan_id/{pesanan_id}", response_model=List[schemas.PesananDetail])
+def read_pesanan_detail_pesanan_id(pesanan_id: int, db: Session = Depends(get_db)):
+    db_pesanan_detail = crud.get_detail_pesanan_pesanan_id(db, pesanan_id=pesanan_id)
+    if db_pesanan_detail is None:
+        raise HTTPException(status_code=404, detail="No Item Found")
+    return db_pesanan_detail
 
 @app.put("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
 def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session = Depends(get_db)):
@@ -232,39 +247,59 @@ def delete_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
     crud.delete_pesanan(db, pesanan_id=pesanan_id)
     return {"message": "Pesanan deleted"}
 
-@app.post("/pesanan/checkout/{user_id}", response_model=List[schemas.Pesanan])
+@app.post("/pesanan/checkout/{user_id}", response_model=schemas.Pesanan)
 def checkout(user_id: int, db: Session = Depends(get_db)):
     # Ambil semua item dalam keranjang berdasarkan user_id
     keranjang_items = crud.get_keranjang_by_user(db, user_id=user_id)
     if not keranjang_items:
         raise HTTPException(status_code=404, detail="Keranjang is empty")
-    
-    pesanan_list = []
+
     try:
+        # 1. Buat pesanan utama
+        pesanan_data = schemas.PesananCreate(
+            user_id=user_id,
+            metode_bayar_id=1,  # Sesuaikan metode pembayaran
+            tanggal=datetime.now().date().isoformat(),
+            waktu=datetime.now().time().isoformat(),
+            status_pesanan="pending",  # Status awal
+            total_harga=0,  # Akan dihitung ulang nanti
+        )
+        pesanan = crud.create_pesanan(db=db, pesanan=pesanan_data)
+        pesanan_id = pesanan.id  # Ambil ID pesanan untuk detail pesanan
+
+        # 2. Pindahkan data dari keranjang ke detail pesanan
+        total_harga_final = 0
         for item in keranjang_items:
-            # Validasi data produk dari keranjang
+            # Validasi produk
             produk = crud.get_produk(db, produk_id=item.produk_id)
             if not produk:
                 raise HTTPException(status_code=400, detail=f"Produk with ID {item.produk_id} not found")
-            
-            # Buat entri pesanan baru berdasarkan data di keranjang
-            pesanan_data = schemas.PesananCreate(
-                user_id=item.user_id,
-                produk_id=item.produk_id,
-                quantity=item.qty,
-                total_harga=produk.harga * item.qty
-            )
-            pesanan = crud.create_pesanan(db=db, pesanan=pesanan_data)
-            pesanan_list.append(pesanan)
 
-        # Hapus semua item keranjang setelah dipindahkan
+            # Hitung total harga untuk item ini
+            total_harga_item = produk.harga * item.qty
+            total_harga_final += total_harga_item
+
+            # Buat entri detail pesanan
+            detail_pesanan_data = schemas.PesananDetailCreate(
+                pesanan_id=pesanan_id,
+                produk_id=item.produk_id,
+                qty=item.qty,
+                harga=total_harga_item
+            )
+            crud.create_detail_pesanan(db=db, detail_pesanan=detail_pesanan_data)
+
+        # 3. Hapus keranjang untuk user
         crud.delete_keranjang_by_user(db, user_id=user_id)
+
+        # 4. Update total harga pesanan utama
+        crud.update_pesanan_total_harga(db=db, pesanan_id=pesanan_id, total_harga=total_harga_final)
+
+        db.commit()  # Commit semua perubahan
+        return pesanan
     except Exception as e:
-        db.rollback()  # Batalkan perubahan jika terjadi kesalahan
+        db.rollback()  # Rollback jika terjadi error
         raise HTTPException(status_code=500, detail=str(e))
-    else:
-        db.commit()  # Commit perubahan jika semua berhasil
-        return pesanan_list
+
 
 # -------------------- KATEGORI CRUD Endpoints --------------------
 
