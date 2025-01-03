@@ -698,6 +698,7 @@
 
     for (const order of filteredOrders) {
         const { id, tanggal, waktu, status_pesanan, detail_pesanan } = order;
+        const formattedTime = waktu.split('.')[0];
 
         const totalPrice = detail_pesanan.reduce((sum, item) => sum + item.qty * item.harga, 0);
 
@@ -734,7 +735,7 @@
             <table style="width: 100%; table-layout: fixed;">
                 <tr>
                     <td style="text-align: left; width: 50%; padding: 10px;">
-                        <strong>${tanggal}, ${new Date(waktu).toLocaleTimeString()}</strong>
+                        <strong>${tanggal}, ${formattedTime}</strong>
                     </td>
                     <td style="text-align: right; width: 50%; padding: 10px;">
                         <strong>Order ID: ${id}</strong>
