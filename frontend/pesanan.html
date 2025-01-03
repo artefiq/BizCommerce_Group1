@@ -768,10 +768,10 @@
         }
       },
 
-      // Fetch detail pesanan berdasarkan order_id
-      async fetchOrderDetails(order_id) {
+      // Fetch detail pesanan berdasarkan pesanan_id
+      async fetchOrderDetails(pesanan_id) {
         try {
-          const response = await axios.get(`http://localhost:8000/orders/${order_id}`, {
+          const response = await axios.get(`http://localhost:8000/orders/${pesanan_id}`, {
             headers: {
               Authorization: `Bearer ${this.access_token}`,
             },
@@ -808,9 +808,9 @@
       },
 
       // Update status pesanan
-      async updateOrderStatus(order_id, new_status) {
+      async updateOrderStatus(pesanan_id, new_status) {
         try {
-          const response = await axios.put(`http://localhost:8000/orders/${order_id}/status`, {
+          const response = await axios.put(`http://localhost:8000/orders/${pesanan_id}/status`, {
             status: new_status,
           }, {
             headers: {
@@ -826,20 +826,20 @@
       },
 
       // Fungsi untuk tombol interaktif
-      handleButtonAction(order) {
-        if (order.status === "Belum Dibayar") {
-          this.updateOrderStatus(order.id, "Dikonfirmasi");
-        } else if (order.status === "Dikirimkan") {
-          this.updateOrderStatus(order.id, "Sudah Sampai");
-        } else if (order.status === "Sudah Sampai") {
+      handleButtonAction(pesanan) {
+        if (pesanan.status === "Belum Dibayar") {
+          this.updateOrderStatus(pesanan.id, "Dikonfirmasi");
+        } else if (pesanan.status === "Dikirimkan") {
+          this.updateOrderStatus(pesanan.id, "Sudah Sampai");
+        } else if (pesanan.status === "Sudah Sampai") {
           window.location.href = "/history.html"; // Pindah ke halaman history
         }
       },
 
       // Fungsi cancel pesanan
-      async cancelOrder(order_id) {
+      async cancelOrder(pesanan_id) {
         try {
-          const response = await axios.delete(`http://localhost:8000/orders/${order_id}`, {
+          const response = await axios.delete(`http://localhost:8000/orders/${pesanan_id}`, {
             headers: {
               Authorization: `Bearer ${this.access_token}`,
             },
