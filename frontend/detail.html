@@ -797,16 +797,47 @@ const user_id = 1; // Replace with the desired user_id
 // Function to handle checkout
 async function checkout(user_id) {
   try {
+    const data = {
+      user_id: user_id,
+      metode_bayar_id: 1,
+      tanggal: new Date().toISOString().split('T')[0],
+      waktu: new Date().toISOString().split('T')[1].split('.')[0],
+      status_pesanan: "pending",
+      id: 0,
+      detail_pesanan: []
+    };
+
+    const cartItems = await get_keranjang_by_user(user_id);
+    for (const item of cartItems) {
+      const product = await get_produk_by_id(item.produk_id);
+      if (!product) {
+        console.error(`Product with ID ${item.produk_id} not found.`);
+        continue; // Skip this item if product details are not found
+      }
+
+      data.detail_pesanan.push({
+        pesanan_id: 0,
+        produk_id: item.produk_id,
+        qty: item.qty,
+        harga: product.harga,
+        id: 0
+      });
+    }
+
     const response = await fetch(`http://localhost:8000/pesanan/checkout/${user_id}`, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       throw new Error("Failed to proceed to checkout");
     }
 
-    const data = await response.json();
-    console.log("Checkout successful:", data);
+    const result = await response.json();
+    console.log("Checkout successful:", result);
 
     // Redirect or show success message
     alert("Checkout successful! Redirecting to order summary...");
