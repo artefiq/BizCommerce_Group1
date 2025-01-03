@@ -195,6 +195,12 @@ def create_detail_pesanan(db: Session, detail_pesanan: schemas.PesananDetailCrea
 def get_pesanan(db: Session, pesanan_id: int):
     return db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).options(joinedload(models.Pesanan.detail_pesanan)).first()
 
+def get_pesanan_user_id(db: Session, user_id: int):
+    return db.query(models.Pesanan).filter(models.Pesanan.user_id == user_id).all()
+
+def get_detail_pesanan_pesanan_id(db: Session, pesanan_id: int):
+    return db.query(models.PesananDetail).filter(models.PesananDetail.pesanan_id == pesanan_id).all()
+
 def get_all_pesanan(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Pesanan).offset(skip).limit(limit).all()
 
