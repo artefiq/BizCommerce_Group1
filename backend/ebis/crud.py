@@ -195,6 +195,12 @@ def create_detail_pesanan(db: Session, detail_pesanan: schemas.PesananDetailCrea
 def get_pesanan(db: Session, pesanan_id: int):
     return db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).options(joinedload(models.Pesanan.detail_pesanan)).first()
 
+def get_pesanan_user_id(db: Session, user_id: int):
+    return db.query(models.Pesanan).filter(models.Pesanan.user_id == user_id).all()
+
+def get_detail_pesanan_pesanan_id(db: Session, pesanan_id: int):
+    return db.query(models.PesananDetail).filter(models.PesananDetail.pesanan_id == pesanan_id).all()
+
 def get_all_pesanan(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Pesanan).offset(skip).limit(limit).all()
 
@@ -220,6 +226,14 @@ def update_pesanan_total_harga(db: Session, pesanan_id: int, total_harga: float)
 def delete_pesanan(db: Session, pesanan_id: int):
     db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).delete()
     db.commit()
+
+def get_orders_by_user_and_status(db: Session, user_id: int, status: str):
+    orders = db.query(models.Pesanan).filter(
+        models.Pesanan.user_id == user_id,
+        models.Pesanan.status == status
+    ).all()
+    print("Fetched orders from DB:", orders)  # Tambahkan log untuk debug
+    return orders
 
 #######################################################################################################
 # Kategori CRUD

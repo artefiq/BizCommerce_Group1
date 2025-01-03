@@ -4,8 +4,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-import crud, models, schemas
-from datetime import datetime
+import crud, models, schemas, datetime
+# from datetime import datetime
 from database import SessionLocal, engine
 from jose import jwt
 
@@ -220,9 +220,23 @@ def read_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Pesanan not found")
     return db_pesanan
 
+@app.get("/pesanan/user_id/{user_id}", response_model=List[schemas.Pesanan])
+def read_pesanan_user_id(user_id: int, db: Session = Depends(get_db)):
+    return crud.get_pesanan_user_id(db, user_id=user_id)
+    # if db_pesanan is None:
+    #     raise HTTPException(status_code=404, detail="Pesanan not found")
+    # return db_pesanan
+
 @app.get("/pesanan/", response_model=List[schemas.Pesanan])
 def read_all_pesanan(db: Session = Depends(get_db)):
     return crud.get_all_pesanan(db)
+
+@app.get("/pesanan_detail/pesanan_id/{pesanan_id}", response_model=List[schemas.PesananDetail])
+def read_pesanan_detail_pesanan_id(pesanan_id: int, db: Session = Depends(get_db)):
+    db_pesanan_detail = crud.get_detail_pesanan_pesanan_id(db, pesanan_id=pesanan_id)
+    if db_pesanan_detail is None:
+        raise HTTPException(status_code=404, detail="No Item Found")
+    return db_pesanan_detail
 
 @app.put("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
 def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session = Depends(get_db)):
@@ -245,8 +259,8 @@ def checkout(user_id: int, db: Session = Depends(get_db)):
         pesanan_data = schemas.PesananCreate(
             user_id=user_id,
             metode_bayar_id=1,  # Sesuaikan metode pembayaran
-            tanggal=datetime.now().date().isoformat(),
-            waktu=datetime.now().time().isoformat(),
+            tanggal=datetime.datetime.now().date().isoformat(),  # Gunakan datetime.datetime
+            waktu=datetime.datetime.now().time().isoformat(),  # Gunakan datetime.datetime
             status_pesanan="pending",  # Status awal
             total_harga=0,  # Akan dihitung ulang nanti
         )
@@ -338,3 +352,10 @@ def update_metode(metode_id: int, metode: schemas.MetodeUpdate, db: Session = De
 def delete_metode(metode_id: int, db: Session = Depends(get_db)):
     crud.delete_metode(db, metode_id=metode_id)
     return {"message": "Metode deleted"}
+
+@app.get("/pesanan/history/{user_id}", response_model=List[schemas.Pesanan])
+def read_order_history(user_id: int, db: Session = Depends(get_db)):
+    db_orders = crud.get_orders_by_user_and_status(db, user_id=user_id, status="Selesai")
+    if not db_orders:
+        raise HTTPException(status_code=404, detail="No completed orders found for this user")
+    return db_orders
