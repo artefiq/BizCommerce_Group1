@@ -610,7 +610,7 @@
 
   <!-- Vue.js Instance -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script>
+  <!-- <script>
     const { createApp } = Vue;
   
     createApp({
@@ -707,7 +707,137 @@
         }
       },
     }).mount("#product-section");
-  </script>
+  </script> -->
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const { createApp } = Vue;
+
+  createApp({
+    data() {
+      return {
+        cart: [], // Data produk dalam keranjang
+        orders: [], // Data semua pesanan pengguna
+        orderDetails: {}, // Detail pesanan
+        user_id: null, // ID pengguna
+        access_token: null, // Token akses
+      };
+    },
+    methods: {
+      // Fetch semua pesanan berdasarkan user_id
+      async fetchOrders() {
+        try {
+          const response = await axios.get(`http://localhost:8000/orders/user/${this.user_id}`, {
+            headers: {
+              Authorization: `Bearer ${this.access_token}`,
+            },
+          });
+          this.orders = response.data;
+        } catch (error) {
+          console.error("Error fetching orders:", error.message);
+        }
+      },
+
+      // Fetch detail pesanan berdasarkan order_id
+      async fetchOrderDetails(order_id) {
+        try {
+          const response = await axios.get(`http://localhost:8000/orders/${order_id}`, {
+            headers: {
+              Authorization: `Bearer ${this.access_token}`,
+            },
+          });
+          this.orderDetails = response.data;
+        } catch (error) {
+          console.error("Error fetching order details:", error.message);
+        }
+      },
+
+      // Pindahkan produk dari cart ke orders saat checkout
+      async checkoutCart() {
+        if (this.cart.length === 0) {
+          alert("Keranjang kosong!");
+          return;
+        }
+
+        try {
+          const response = await axios.post(`http://localhost:8000/orders/checkout`, {
+            user_id: this.user_id,
+            items: this.cart,
+          }, {
+            headers: {
+              Authorization: `Bearer ${this.access_token}`,
+            },
+          });
+
+          alert("Checkout berhasil! Pesanan telah dibuat.");
+          this.cart = []; // Kosongkan keranjang
+          this.fetchOrders(); // Refresh daftar pesanan
+        } catch (error) {
+          console.error("Error during checkout:", error.message);
+        }
+      },
+
+      // Update status pesanan
+      async updateOrderStatus(order_id, new_status) {
+        try {
+          const response = await axios.put(`http://localhost:8000/orders/${order_id}/status`, {
+            status: new_status,
+          }, {
+            headers: {
+              Authorization: `Bearer ${this.access_token}`,
+            },
+          });
+
+          alert("Status pesanan diperbarui!");
+          this.fetchOrders(); // Refresh daftar pesanan
+        } catch (error) {
+          console.error("Error updating order status:", error.message);
+        }
+      },
+
+      // Fungsi untuk tombol interaktif
+      handleButtonAction(order) {
+        if (order.status === "Belum Dibayar") {
+          this.updateOrderStatus(order.id, "Dikonfirmasi");
+        } else if (order.status === "Dikirimkan") {
+          this.updateOrderStatus(order.id, "Sudah Sampai");
+        } else if (order.status === "Sudah Sampai") {
+          window.location.href = "/history.html"; // Pindah ke halaman history
+        }
+      },
+
+      // Fungsi cancel pesanan
+      async cancelOrder(order_id) {
+        try {
+          const response = await axios.delete(`http://localhost:8000/orders/${order_id}`, {
+            headers: {
+              Authorization: `Bearer ${this.access_token}`,
+            },
+          });
+
+          alert("Pesanan dibatalkan!");
+          this.fetchOrders();
+        } catch (error) {
+          console.error("Error cancelling order:", error.message);
+        }
+      },
+    },
+    async mounted() {
+      // Ambil data user dari localStorage
+      const userData = localStorage.getItem("userData");
+      if (userData) {
+        const parsedData = JSON.parse(userData);
+        this.user_id = parsedData.user_id;
+        this.access_token = parsedData.access_token;
+
+        this.fetchOrders(); // Fetch pesanan setelah login
+      } else {
+        alert("Anda belum login. Silakan login terlebih dahulu.");
+        window.location.href = "/login.html";
+      }
+    },
+  }).mount("#app");
+</script>
 
   <script src="js/jquery-1.11.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
