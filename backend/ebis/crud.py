@@ -227,6 +227,14 @@ def delete_pesanan(db: Session, pesanan_id: int):
     db.query(models.Pesanan).filter(models.Pesanan.id == pesanan_id).delete()
     db.commit()
 
+def get_orders_by_user_and_status(db: Session, user_id: int, status: str):
+    orders = db.query(models.Pesanan).filter(
+        models.Pesanan.user_id == user_id,
+        models.Pesanan.status == status
+    ).all()
+    print("Fetched orders from DB:", orders)  # Tambahkan log untuk debug
+    return orders
+
 #######################################################################################################
 # Kategori CRUD
 
