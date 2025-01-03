@@ -4,8 +4,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List
-import crud, models, schemas
-from datetime import datetime
+import crud, models, schemas, datetime
+# from datetime import datetime
 from database import SessionLocal, engine
 from jose import jwt
 
@@ -352,3 +352,10 @@ def update_metode(metode_id: int, metode: schemas.MetodeUpdate, db: Session = De
 def delete_metode(metode_id: int, db: Session = Depends(get_db)):
     crud.delete_metode(db, metode_id=metode_id)
     return {"message": "Metode deleted"}
+
+@app.get("/pesanan/history/{user_id}", response_model=List[schemas.Pesanan])
+def read_order_history(user_id: int, db: Session = Depends(get_db)):
+    db_orders = crud.get_orders_by_user_and_status(db, user_id=user_id, status="Selesai")
+    if not db_orders:
+        raise HTTPException(status_code=404, detail="No completed orders found for this user")
+    return db_orders

@@ -240,6 +240,53 @@ function fetchProductList() {
   });
 }
 
+// Fetch Order History
+async function fetchOrderHistory() {
+  const userData = localStorage.getItem("userData");
+  if (userData) {
+    const parsedData = JSON.parse(userData);
+    const user_id = parsedData.user_id;
+    const access_token = parsedData.access_token;
+
+    try {
+      const response = await axios.get(`http://localhost:8000/pesanan/history/${user_id}`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+      if (response.data.length === 0) {
+        console.warn("No completed orders found.");
+      } else {
+        console.log("Fetched orders:", response.data);
+      }
+
+      const orderList = document.getElementById('order-list');
+      orderList.innerHTML = '';
+
+      response.data.forEach(order => {
+        const orderItem = document.createElement('div');
+        orderItem.classList.add('order-item');
+        orderItem.innerHTML = `
+          <div>
+            <strong>Order ID: ${order.id}</strong>
+            <p>Date: ${order.tanggal}</p>
+            <p>Status: ${order.status}</p>
+            <p>Total: Rp ${order.total.toLocaleString('id-ID')}</p>
+            <a href="detail.html?id=${order.id}" class="btn btn-primary">Lihat Detail</a>
+          </div>
+        `;
+        orderList.appendChild(orderItem);
+      });
+    } catch (error) {
+      console.error("Error fetching order history:", error.response?.data?.detail || error.message);
+    }
+  } else {
+    console.warn("No user data found. Redirecting to login page.");
+    window.location.href = "login.html";
+  }
+}  
+
 // Panggil fungsi saat halaman dimuat
 document.addEventListener('DOMContentLoaded', fetchProductList);
 
