@@ -220,9 +220,23 @@ def read_pesanan(pesanan_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Pesanan not found")
     return db_pesanan
 
+@app.get("/pesanan/user_id/{user_id}", response_model=List[schemas.Pesanan])
+def read_pesanan_user_id(user_id: int, db: Session = Depends(get_db)):
+    return crud.get_pesanan_user_id(db, user_id=user_id)
+    # if db_pesanan is None:
+    #     raise HTTPException(status_code=404, detail="Pesanan not found")
+    # return db_pesanan
+
 @app.get("/pesanan/", response_model=List[schemas.Pesanan])
 def read_all_pesanan(db: Session = Depends(get_db)):
     return crud.get_all_pesanan(db)
+
+@app.get("/pesanan_detail/pesanan_id/{pesanan_id}", response_model=List[schemas.PesananDetail])
+def read_pesanan_detail_pesanan_id(pesanan_id: int, db: Session = Depends(get_db)):
+    db_pesanan_detail = crud.get_detail_pesanan_pesanan_id(db, pesanan_id=pesanan_id)
+    if db_pesanan_detail is None:
+        raise HTTPException(status_code=404, detail="No Item Found")
+    return db_pesanan_detail
 
 @app.put("/pesanan/{pesanan_id}", response_model=schemas.Pesanan)
 def update_pesanan(pesanan_id: int, pesanan: schemas.PesananUpdate, db: Session = Depends(get_db)):
